@@ -49,6 +49,7 @@ class generalContainer
 	private $ubigeos = array();
 	private $families_members = array();
 	private $relationships = array();
+	private $payment_documents = array();
 	private $studentsXfamily_members = array();
 	private $groups_students = array();
 	private $configurations = array();
@@ -88,6 +89,11 @@ class generalContainer
 
 	//breadcrumb
 	private $breadcrumb = array();	
+
+	//REPORTS
+	private $consolidatedDebtReportGrid = array();
+	private $dateFrom;
+	private $dateTo;
 
 	public function __construct()
 	{

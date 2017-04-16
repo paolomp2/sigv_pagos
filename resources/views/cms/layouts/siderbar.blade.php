@@ -41,13 +41,13 @@
           <li><a><i class="fa fa-retweet"></i> Dstos e Intereses<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu" style="display: none">
               <li><a href="/discounts/">Descuentos</a></li>
-              <li><a href="/interests">Intereses</a></li>
+              <!-- <li><a href="/interests">Intereses</a></li> -->
             </ul>
           </li>
           <li><a><i class="fa fa-money"></i> Realizar pagos<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu" style="display: none">
               <li><a href="/showListStudents/">Realizar pagos</a></li>
-              <li><a href="/consult_debts">Consultar Deudas</a></li>
+              <!-- <li><a href="/consult_debts">Consultar Deudas</a></li> -->
             </ul>
           </li>
         </ul>
@@ -57,11 +57,18 @@
       <div class="menu_section">
         <h3>Infraestructura</h3>
         <ul class="nav side-menu">
-          <li><a><i class="fa fa-university"></i> Aulas<span class="fa fa-chevron-down"></span></a>
+          <li><a><i class="fa fa-users"></i> Aulas y Grupos<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu" style="display: none">
               <li><a href="/classrooms/">Aulas</a></li>
+              <li><a href="/groups/">Grupos</a></li>
             </ul>
-          </li>          
+          </li>      
+          
+          <!--<li><a><i class="fa fa-users"></i> Grupos<span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu" style="display: none">
+              
+            </ul>
+          </li>--> 
         </ul>
       </div>
       @endif
@@ -70,38 +77,48 @@
         <ul class="nav side-menu">
           <li><a><i class="fa fa-male"></i> Alumnos<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu" style="display: none">
-              <li><a href="/students/">Alumnos matriculados</a></li>
-              <li><a href="/students/all/all">Todos los alumnos</a></li>
-              <li><a href="/students/bulcked/bulcked/">Alumnos por volcado</a></li>
-            </ul>
-          </li>
-
-          <li><a><i class="fa fa-upload"></i> Matrícula<span class="fa fa-chevron-down"></span></a>
-            <ul class="nav child_menu" style="display: none">
+              <li><a href="/students/">Lista de Alumnos</a></li>
+              <!-- <li><a href="/students/all/all">Todos los alumnos</a></li>
+              <li><a href="/students/bulcked/bulcked/">Alumnos por volcado</a></li> -->
               <li><a href="/students/enrolling_fast/enrolling_fast/">Matrícula rápida</a></li>
-            </ul>
-          </li>
-
-          <li><a><i class="fa fa-sitemap"></i> Familiar<span class="fa fa-chevron-down"></span></a>
-            <ul class="nav child_menu" style="display: none">
               <li><a href="/family_members/">Lista de Familiares</a></li>
+              <li><a href="/students/bulck/bulck">Importar desde Excel</a></li>
             </ul>
           </li>
 
-
-          <li><a><i class="fa fa-users"></i> Grupos<span class="fa fa-chevron-down"></span></a>
-            <ul class="nav child_menu" style="display: none">
-              <li><a href="/groups/">Grupos</a></li>
+          <!--<li><a><i class="fa fa-upload"></i> Matrícula<span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu" style="display: none">              
             </ul>
-          </li>              
+          </li>
+          <li><a><i class="fa fa-sitemap"></i> Familiar<span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu" style="display: none">              
+            </ul>
+          </li>                       
           <li><a><i class="fa fa-upload"></i>Cargar desde<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu" style="display: none">
-              <li><a href="/students/bulck/bulck">Excel</a></li>
+              
             </ul>
-          </li>
+          </li>-->
         </ul>
       </div>
-
+      <div class="menu_section">
+        <h3>Reportes</h3>
+        <ul class="nav side-menu">
+          <li><a><i class="fa fa-area-chart"></i> Pagos<span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu" style="display: none">
+              <li><a href="/reports/consolidatedDebtReportGet">Consolidado por aula</a></li>
+              <li><a href="/reports/paymentsByDatesReportGet">Pagos por fechas</a></li>
+              <!--<li><a href="/reports/debtorReportGet">Top de deudores</a></li>-->
+            </ul>
+          </li>      
+          
+          <!--<li><a><i class="fa fa-users"></i> Grupos<span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu" style="display: none">
+              
+            </ul>
+          </li>--> 
+        </ul>
+      </div>
     </div>
     <!-- /sidebar menu -->
 

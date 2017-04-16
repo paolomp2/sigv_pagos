@@ -178,7 +178,7 @@ class classroomController extends Controller
             }
         }
 
-        $name_by_infraestructure = $name_by_infraestructure.chr($number_classroom+63);
+        $name_by_infraestructure = $name_by_infraestructure.chr($number_classroom+64);
 
         $classroom->description = $name_by_infraestructure;
         

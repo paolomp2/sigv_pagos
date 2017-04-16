@@ -4,7 +4,7 @@
   }
     $gc->table = true;
     $gc->url_base = "students";    
-    $gc->page_name = "Lista de alumnos matriculados";
+    $gc->page_name = "Lista de alumnos";
     $gc->page_description = "Esta lista contiene la lista de grupos de alumnos";
     $bEnrolledFlag = true;
     $gc->breadcrumb('students');
@@ -19,8 +19,8 @@
   <thead>
     <tr>
       <th>#</th>
-      <th>Nombres</th>
       <th>Apellidos</th>
+      <th>Nombres</th>      
       @if($bEnrolledFlag)
       <th>Aula</th>
       @endif
@@ -32,10 +32,12 @@
     @foreach($gc->students as $student)
     <tr>
       <td scope="row">{!!$i!!}</td>
-      <td>{!!$student->first_name!!} {!!$student->middle_name!!}</td>
       <td>{!!$student->last_name!!} {!!$student->maiden_name!!}</td>
-      @if($bEnrolledFlag)
-      <td>{!!$student->Classroom->description!!}</td>                  
+      <td>{!!$student->first_name!!}</td>      
+      @if($student->enrolled_flag==1)
+        <td>{!!$student->Classroom->description!!}</td>                  
+      @else
+        <td></td>                  
       @endif
       <td>
         <?php 

@@ -42,14 +42,8 @@ class family_memberController extends Controller
         $families_members = Family_member::where('visible_flag',1)->get();
         
         $gc = new generalContainer;
-        $gc->table = true;
-        $gc->url_base = "family_members";
         $gc->families_members = $families_members;
-        $gc->page_name = "Lista de familiares de estudiantes";
-        $gc->page_description = "Esta lista contiene la lista de familiares de estudiantes";
-        $gc->add_elements = true;
-        $gc->msg_add_elements = "Agregar Alumnos";
-        $gc->breadcrumb('family_members');
+        
         return view('cms.family_members.list', compact('gc'));
     }
 
@@ -194,6 +188,24 @@ class family_memberController extends Controller
         return Redirect::to('/family_members');
     }
 
+    public function add_list($id)
+    {
+        $family_member = Family_member::find(Hashids::decode($id)[0]-1000);       
+
+        $gc = new generalContainer;
+        $gc->table = true;
+        $gc->url_base = "family_members";
+        $gc->page_name = "Lista de estudiantes relacionados a: ".$family_member->first_name." ".$family_member->middle_name.", ".$family_member->last_name." ".$family_member->maiden_name;
+        $gc->page_description = "Esta lista contiene la lista de estudiantes relacionados a un familiar";
+        $gc->entity_to_edit = $family_member;
+        $gc->studentsXfamily_members = studentXfamily_member::where('id_family_member', $family_member->id)->get();
+        $gc->msg_add_elements = "Lista de alumnos relacionados";
+        $gc->default_buttons = false;
+        $gc->add_buttons = true;
+        $gc->breadcrumb('family_members.add_list');
+        return view('cms.family_members.list_students', compact('gc'));
+    }
+
     public function add($id)
     {
         $gc = new generalContainer;        
@@ -204,11 +216,12 @@ class family_memberController extends Controller
         $gc->entity_to_edit = Family_member::find(Hashids::decode($id)[0]-1000);
         $gc->page_name = "Relacionar alumnos a: ".$gc->entity_to_edit->first_name." ".$gc->entity_to_edit->middle_name.", ".$gc->entity_to_edit->last_name." ".$gc->entity_to_edit->maiden_name;
         //echo dd($gc->entity_to_edit);
-        $gc->students = Student::whereNotNull('id_md5')->where('enrolled_flag',0)->get();
+        $gc->students = Student::where('enrolled_flag',1)->get();
         
         $gc->select = true;
         $gc->relationships = Relationship::all();
         $gc->breadcrumb('students.add');
+
 
         return view('cms.family_members.add', compact('gc'));
     }
@@ -240,26 +253,8 @@ class family_memberController extends Controller
         $family_member->num_students = $family_member->num_students + (count($id_md5_students)-1)/2;
         $family_member->save();
 
-        return Redirect::to('/family_members/'.$request->family_member_id.'/list/');
-    }
-
-    public function add_list($id)
-    {
-        $family_member = Family_member::find($id);        
-
-        $gc = new generalContainer;
-        $gc->table = true;
-        $gc->url_base = "family_members";
-        $gc->page_name = "Lista de estudiantes relacionados a: ".$family_member->first_name." ".$family_member->middle_name.", ".$family_member->last_name." ".$family_member->maiden_name;
-        $gc->page_description = "Esta lista contiene la lista de estudiantes relacionados a un familiar";
-        $gc->entity_to_edit = $family_member;
-        $gc->studentsXfamily_members = studentXfamily_member::where('id_family_member', $family_member->id)->get();
-        $gc->msg_add_elements = "Lista de alumnos relacionados";
-        $gc->default_buttons = false;
-        $gc->add_buttons = true;
-        $gc->breadcrumb('family_members.add_list');
-        return view('cms.family_members.list_students', compact('gc'));
-    }
+        return Redirect::to('/family_members/'.$family_member->id_md5.'/list/');
+    }    
 
     public function add_inactive($id)
     {
@@ -351,4 +346,5 @@ class family_memberController extends Controller
         Family_member::onlyTrashed()->find(Hashids::decode($id)[0]-1000)->restore();
         return Redirect::to('family_members/trash/trash');
     }
+
 }

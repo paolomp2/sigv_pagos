@@ -61,15 +61,13 @@ class concept_groupController extends Controller
     {
         $gc = new generalContainer;
         $gc->create = true;
-        $gc->page_name = "Crear nuevo Concepto de Grupo";
+        $gc->page_name = "Crear nuevo Grupo de Concepto";
         $gc->page_description = "Inserte los campos requeridos";
         $gc->select = true;
         $gc->url_base = "concepts_groups";
         $gc->form = true;
         $gc->breadcrumb('concepts_groups.create');
         $c_gc = new concept_groupsContainer;
-        $gc->discounts = Discount::all();
-        $gc->interests = Interest::all();
         $gc->configurations = Configuration::all();
         return view('cms.concept_groups.form', compact('gc','c_gc'));
     }
@@ -87,20 +85,7 @@ class concept_groupController extends Controller
         $mConceptGroup->name = $request->name;
         $mConceptGroup->amount = $request->amount;
         $mConceptGroup->year = $request->selected_year;
-        $mConceptGroup->save();
-        $mConceptGroup->set_discounts_id($request->discounts);
-        $mConceptGroup->set_interests_id($request->interest);
-
-        $cConcept = Concept::where('id_concept_group', $mConceptGroup->id)->get();
-
-        foreach ($cConcept as $mConcept) {
-            foreach ($request->discounts as $id_discount) {
-                $oConceptxdiscount = new conceptxdiscount;
-                $oConceptxdiscount->id_concept = $mConcept->id;
-                $oConceptxdiscount->id_discount = $id_discount;
-                $oConceptxdiscount->save();
-            }
-        }
+        $mConceptGroup->save();        
 
         return Redirect::to('/concepts_groups');
     }
@@ -137,11 +122,7 @@ class concept_groupController extends Controller
         $gc->page_name = "Editar Grupo de conceptos";
         $gc->description = "Modifique los datos necesarios";
         $gc->select = true;
-        $gc->discounts = Discount::all();
-        $gc->interests = Interest::all();
         $gc->configurations = Configuration::all();
-        $gc->discounts_id = $cg->get_discounts_id()->get();
-        $gc->interests_id = $cg->get_interests_id()->get();
         $gc->breadcrumb('concepts_groups.edit.'.$cg->name);
         $gc->entity_to_edit = $cg;
 

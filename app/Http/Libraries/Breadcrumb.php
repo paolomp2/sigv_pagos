@@ -106,7 +106,7 @@ class BreadCrumb{
 				case 'students':
 					$this->url_base = $cElementBreadCrumb['href'] ='/students/';
 					$this->name_base = "Estudiantes";
-					$cElementBreadCrumb['label'] ='Lista de Estudiantes Matriculados';
+					$cElementBreadCrumb['label'] ='Lista de Alumnos';
 					break;
 				
 				case 'concepts_groups':

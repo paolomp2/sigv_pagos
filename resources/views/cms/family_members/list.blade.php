@@ -1,3 +1,14 @@
+<?php
+  $gc->table = true;
+  $gc->add_elements = true;
+  
+  $gc->url_base = "family_members";        
+  $gc->page_name = "Lista de familiares de estudiantes";
+  $gc->page_description = "Esta lista contiene la lista de familiares de estudiantes";        
+  $gc->msg_add_elements = "Ver Alumnos";
+  $gc->breadcrumb('family_members');
+?>
+
 @extends('cms.templates.template')
 
 @section('content')
@@ -8,7 +19,7 @@
       <th>#</th>
       <th>Nombres</th>
       <th>Apellidos</th>
-      <th>Num. Estudiantes</th>
+      <th>Estudiantes relacionados</th>
       <th>Opciones</th>
     </tr>
   </thead>
@@ -29,7 +40,7 @@
           if (is_null($family_member->deleted_at)) {
             $route_edit = "/".$gc->url_base."/".$family_member->id_md5."/edit/";
             $route_destroy = "/".$gc->url_base."/".$family_member->id_md5."/inactive/";
-            $route_add_elements = "/".$gc->url_base."/".$family_member->id_md5."/add/";
+            $route_add_elements = "/".$gc->url_base."/".$family_member->id_md5."/list/";
             $status = "active";
           }else{
 
@@ -44,7 +55,7 @@
         <a href=<?php echo $route_destroy;?> class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Desactivar </a>
           @endif
           @if($gc->add_elements)
-        <a href=<?php echo $route_add_elements;?> class="btn btn-round btn-success"><i class="fa fa-arrow-circle-up"></i> {!!$gc->msg_add_elements!!}</a>
+        <a href=<?php echo $route_add_elements;?> class="btn btn-success btn-xs"><i class="fa fa-arrow-circle-up"></i> {!!$gc->msg_add_elements!!}</a>
           @endif
         @else
         <a href=<?php echo $route_untrashed;?> class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Restaurar </a>

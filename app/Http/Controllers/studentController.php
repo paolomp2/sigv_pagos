@@ -44,18 +44,16 @@ class studentController extends Controller
      */
     public function index()
     {
-        $students = Student::where('enrolled_flag',1)->where('comparison_verified',1)->get();
-
-        foreach ($students as $student) {
-            if($student->id_md5==""){
-                $student->id_md5 = Hashids::encode($student->id+1000);
-                $student->save();
-            }
-        }
+        $students = Student::orderBy('enrolled_flag','desc')
+                            ->orderBy('identifier','asc')
+                            ->orderBy('last_name','asc')
+                            ->orderBy('maiden_name','asc')
+                            ->orderBy('first_name','asc')
+                            ->get();
 
         $gc = new generalContainer;
         $gc->students = $students;
-        
+
         return view('cms.students.list', compact('gc'));
     }
 
@@ -74,7 +72,7 @@ class studentController extends Controller
         $gc->table = true;
         $gc->url_base = "students";
         $gc->students = $students;
-        $gc->page_name = "Lista de alumnos registrados";
+        $gc->page_name = "Lista de alumnos";
         $gc->page_description = "Esta lista contiene la lista de grupos de alumnos";
         $gc->breadcrumb('all_students');
         return view('cms.students.list', compact('gc'));
@@ -138,20 +136,11 @@ class studentController extends Controller
     {
         //echo dd($request);
         $student = Student::find($request->student_id);
-
-        $names = $request->names;
-        $names_array = preg_split("` `", $names);
-
-        $student->first_name = $names_array[0];
-
-        $middle_name="";
-        for ($i=1; $i < count($names_array) ; $i++) { 
-            $middle_name = $middle_name." ".$names_array[1];
-        }
-        $student->middle_name = $middle_name;
-
+        
+        $student->first_name = $request->names;
         $student->last_name = $request->last_name;
         $student->maiden_name = $request->maiden_name;
+
         $student->gender = $request->gender;
         $student->dni = str_replace("-","",$request->dni);
         $student->ubigeo_id = $request->ubigeo;
@@ -218,21 +207,7 @@ class studentController extends Controller
         //echo dd($request);
         $student = Student::find($id);
         
-        $names = $request->names;
-        $names_array = preg_split("` `", $names);
-
-        $student->first_name = $names_array[0];
-
-        $middle_name="";
-        for ($i=1; $i < count($names_array) ; $i++) {
-            if($i==1)
-                $middle_name = $names_array[$i];
-            else
-                $middle_name = $middle_name." ".$names_array[$i];
-        }
-        
-        $student->middle_name = $middle_name;
-
+        $student->first_name = $request->names;
         $student->last_name = $request->last_name;
         $student->maiden_name = $request->maiden_name;
         $student->gender = $request->gender;

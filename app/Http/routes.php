@@ -79,8 +79,8 @@ Route::group(['middleware' => 'auth'], function (){
 
 	//Students
 	Route::resource('students','studentController');
-	Route::get('/students/all/all', ['uses' =>'studentController@all_students']);
-	Route::get('/students/bulcked/bulcked', ['uses' =>'studentController@bulcked_students']);
+	//Route::get('/students/all/all', ['uses' =>'studentController@all_students']);
+	//oute::get('/students/bulcked/bulcked', ['uses' =>'studentController@bulcked_students']);
 	Route::get('/students/trash/trash', ['uses' =>'studentController@trash']);
 	Route::get('/students/{id}/inactive', ['uses' =>'studentController@inactive']);
 	Route::get('/students/{id}/untrashed', ['uses' =>'studentController@untrashed']);
@@ -104,7 +104,7 @@ Route::group(['middleware' => 'auth'], function (){
 		//Pictures
 	Route::post('/family_members/picture/', ['as'=>'families_members.picture', 'uses' => 'family_memberController@picture']);
 		//Enroller fast
-	Route::get('/family_members/{id}/add/', ['uses' => 'family_memberController@add']);
+	Route::get('/family_members/{id}/add_elements/', ['uses' => 'family_memberController@add']);
 	Route::post('/family_members/add/store/', ['as'=>'family_members.add_store', 'uses' => 'family_memberController@add_store']);
 	Route::get('/family_members/{id}/add_inactive/', ['uses' => 'family_memberController@add_inactive']);
 	Route::get('/family_members/{id}/list/', ['uses' => 'family_memberController@add_list']);
@@ -131,7 +131,12 @@ Route::group(['middleware' => 'auth'], function (){
 
 	Route::get('/classrooms/{id}/add', ['uses' =>'classroomController@list_student']);
 
-
+	//REPORTS
+	Route::get('/reports/consolidatedDebtReportGet', ['uses' =>'reportController@consolidatedDebtReportGet']);
+	Route::post('/groups/consolidatedDebtReport', ['as'=>'reports.consolidatedDebtReport', 'uses' => 'reportController@consolidatedDebtReport']);
+	Route::get('/reports/paymentsByDatesReportGet', ['uses' =>'reportController@paymentsByDatesReportGet']);
+	Route::post('/groups/paymentsByDatesReport', ['as'=>'reports.paymentsByDatesReport', 'uses' => 'reportController@paymentsByDatesReport']);
+	
 });
 
 /*Event::listen('illuminate.query',function($query){
