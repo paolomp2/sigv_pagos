@@ -15,7 +15,6 @@ use sigc\conceptxstudent;
 use sigc\conceptXgroup;
 use sigc\studentxgroupxyear;
 use sigc\conceptxinterest;
-use sigc\conceptXgroup;
 
 use sigc\Interest;
 use sigc\Discount;
