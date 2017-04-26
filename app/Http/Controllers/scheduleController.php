@@ -12,7 +12,7 @@ use sigc\Schedule;
 use sigc\Concept;
 use sigc\Group;
 use sigc\conceptxstudent;
-use sigc\conceptxgroup;
+use sigc\conceptXgroup;
 use sigc\studentxgroupxyear;
 use sigc\conceptxinterest;
 use sigc\conceptXgroup;
