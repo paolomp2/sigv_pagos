@@ -12,7 +12,7 @@ use sigc\Schedule;
 use sigc\Concept;
 use sigc\Group;
 use sigc\conceptxstudent;
-use sigc\conceptxgroup;
+use sigc\conceptXgroup;
 use sigc\studentxgroupxyear;
 use sigc\conceptxinterest;
 
@@ -239,7 +239,7 @@ class scheduleController extends Controller
     {
         //select all groups to apply
         //for each group apply the concept
-        $conceptsxgroups = conceptxgroup::where("id_concept",$concept_id)->get();
+        $conceptsxgroups = conceptXgroup::where("id_concept",$concept_id)->get();
         foreach ($conceptsxgroups as $conceptxgroup) {
             $this->apply_concept_to_group($concept_id, $conceptxgroup->id_group);
         }
