@@ -370,87 +370,83 @@ class studentController extends Controller
         $bulck->year = $mClassroom->year;
         $bulck->save();
 
-        $b_c = new bulckContainer;
-        $b_c->id = $bulck->id;
-        $b_c->file_name = $request->file('file_excel')->getClientOriginalName();
+        $oBulckContainer = new bulckContainer;
+        $oBulckContainer->id = $bulck->id;
+        $oBulckContainer->file_name = $request->file('file_excel')->getClientOriginalName();
 
-        $excel=Excel::load($file_Name, function($reader) use($b_c, $request, $bulck,$mClassroom) {
+        $excel=Excel::load($file_Name, function($reader) use($oBulckContainer, $request, $bulck,$mClassroom) {
 
             //creando array auxiliar
             $aux_dates = array();
             //Por cada hoja
-            foreach($reader->get() as $sheet)
-            {
-                $b_c->num_students_aux=0;
+            $sheet = $reader->getSheetByName('Hoja1');
+
+            $i = 1;            
+            while ($sheet->getCellByColumnAndRow(0,$i)<> "") {                
                 
-                $sheet->each(function($row) use($b_c, $mClassroom, $bulck) {
+                $student = new Student;
 
-                    //Tope de lectura
-                    //si la siguiente linea esta vacía, se retorna
-                    /*if($row->get('name')==""){
-                        return;
-                    }*/
+                $oBulckContainer->num_students++;
+                $oBulckContainer->num_students_aux++;
+                $student->full_name = $sheet->getCellByColumnAndRow(0,$i);
 
-                    $student = new Student;
+                $student_name_array = explode(" ",$student->full_name);
 
-                    $b_c->num_students++;
-                    $b_c->num_students_aux++;
-                    $student->full_name = $row->get('name');
-                    $student_name_array = explode(" ",$student->full_name);                   
-                    
+                if (count($student_name_array)>0) {
+                    $student->last_name = $student_name_array[0];
+                }
+                
+                if (count($student_name_array)>1) {
+                    $student->maiden_name = $student_name_array[1];
+                }
 
-                    if (count($student_name_array)>0) {
-                        $student->last_name = $student_name_array[0];
-                    }
-                    
-                    if (count($student_name_array)>1) {
-                        $student->maiden_name = $student_name_array[1];
-                    }
+                if (count($student_name_array)>2) {
+                    $student->first_name = $student_name_array[2];
+                }
 
-                    if (count($student_name_array)>2) {
-                        $student->first_name = $student_name_array[2];
-                    }
+                if (count($student_name_array)>3) {
+                    $student->middle_name = $student_name_array[3];
+                }
 
-                    if (count($student_name_array)>3) {
-                        $student->middle_name = $student_name_array[3];
-                    }
+                
+                $student->id_bulcks_excel = $bulck->id;
+                $student->identifier = $mClassroom->identifier;
+                
+                $configuration = Configuration::where('year',$mClassroom->year)->first();
+                
+                $student->enrolled_flag = 1;  
+                //dd($configuration);
+                $student->year = $configuration->year;
+                
+                $student->comparison_verified = 0;
+                $student->save();
+                $student->id_md5 = Hashids::encode($student->id+1000);
+                $student->save();
 
-                    
-                    $student->id_bulcks_excel = $bulck->id;
-                    $student->identifier = $mClassroom->identifier;
-                    
-                    $configuration = Configuration::where('year',$mClassroom->year)->first();
-                    
-                    $student->enrolled_flag = 1;  
-                    $student->year = $configuration->year;
-                    $student->comparison_verified = 0;
-                    $student->save();
-                    $student->id_md5 = Hashids::encode($student->id+1000);
-                    $student->save();
+                $relationship = new studentXgroupXyear;
+                $relationship->id_group = $mClassroom->id;
+                $relationship->id_student = $student->id;
+                $relationship->save();
 
-                    $relationship = new studentXgroupXyear;
-                    $relationship->id_group = $mClassroom->id;
-                    $relationship->id_student = $student->id;
-                    $relationship->save();
+                $mClassroom->num_people = $mClassroom->num_people + 1;
+                $mClassroom->save();
 
-                    $mClassroom->num_people = $mClassroom->num_people + 1;
-                    $mClassroom->save();
+                //adding concept
+                $cConceptxgroup = conceptXgroup::where('id_group',$mClassroom->id)->get();
+                foreach ($cConceptxgroup as $mconceptXgroup) {
+                    $mConcept = concept::find($mconceptXgroup->id_concept);
+                    if(is_null($mConcept))
+                        continue;
+                    $conceptxstudent = new conceptxstudent();
+                    $conceptxstudent->id_concept = $mConcept->id;
+                    $conceptxstudent->original_amount = $mConcept->amount;
+                    $conceptxstudent->id_student = $student->id;
+                    $conceptxstudent->save();
+                }
 
-                    //adding concept
-                    $cConceptxgroup = conceptXgroup::where('id_group',$mClassroom->id)->get();
-                    foreach ($cConceptxgroup as $mconceptXgroup) {
-                        $mConcept = concept::find($mconceptXgroup->id_concept);
-                        if(is_null($mConcept))
-                            continue;
-                        $conceptxstudent = new conceptxstudent();
-                        $conceptxstudent->id_concept = $mConcept->id;
-                        $conceptxstudent->original_amount = $mConcept->amount;
-                        $conceptxstudent->id_student = $student->id;
-                        $conceptxstudent->save();
-                    }
-                });
-                break;             
-            }
+                $oBulckContainer->num_students_aux=$i;
+                $i++;
+            }            
 
         })->get();
 
@@ -562,8 +558,8 @@ class studentController extends Controller
         $gc->page_name = "Resultados de la comparación de usuarios";
         $gc->page_description = "Click en retornar para iniciar una nueva carga masiva de alumnos";        
 
-        $b_c = new bulckContainer;
-        $b_c->num_students_aux = $num_students_proccess;
+        $oBulckContainer = new bulckContainer;
+        $oBulckContainer->num_students_aux = $num_students_proccess;
 
         //Relaciona alumnos con conceptos
         $schedulle = new scheduleController;
