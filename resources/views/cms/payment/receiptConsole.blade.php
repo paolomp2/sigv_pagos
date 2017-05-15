@@ -52,20 +52,27 @@
 		    <tr class="payment_concept_tr_class">
 		      <th scope="row">{!!$i!!}</th>
 		      <td>{!!$mConcept->name!!}</td>
-		      		<?php $iTotalDiscount = 0; $bApplyDiscounts = false;?>
+		      		<?php 
+		      			$iTotalDiscount = 0; 
+		      			$bApplyDiscounts = false;
+		      			$iLastindexDiscount = -1;
+	      			?>
 		    		@foreach($cDiscountxStudents as $mDiscountxStudents)
+		    			
 			    		@if($mConcept->id == $mDiscountxStudents->id_concept)
+			    			
 			    			@if($mDiscountxStudents->id_discount != $iLastindexDiscount)
 						    	<?php
 				    				$iTotalDiscount+= $mDiscountxStudents->amount;
+				    				$iLastindexDiscount = $mDiscountxStudents->id_discount;
 								?>
-						    	<?php $iLastindexDiscount = $mDiscountxStudents->id_discount;?>			    	
 					    	@endif
 			    		@endif	    		
 			    	@endforeach
 			    	<?php 
 			    		$iLastindexDiscount = -1;
 			    		$iamountRemaining += $iTotalDiscount;
+			    		
 		    		?>
 		      <?php
 		      	if ($iamountRemaining >= ($mConcept->amount)){
@@ -82,22 +89,22 @@
 		      <td>{!!"S/. ".$amountToPayRow!!}</td>
 		    </tr>
 		    	@if($bApplyDiscounts)
-		    	@foreach($cDiscountxStudents as $mDiscountxStudents)
-		    		@if($mConcept->id == $mDiscountxStudents->id_concept)
-		    			@if($mDiscountxStudents->id_discount != $iLastindexDiscount)
-					    	<?php $i++;?>
-					    	<tr class="payment_discount_tr_class" >
-					    		<th scope="row">{!!$i!!}</th>
-					    		<td>{!!$mDiscountxStudents->name!!}</td>
-				    			<?php
-				    				$amountToPayRow = $mDiscountxStudents->amount;
-							    ?>
-							    <td>{!!"- S/. ".$amountToPayRow!!}</td>			    		
-					    	</tr>
-					    	<?php $iLastindexDiscount = $mDiscountxStudents->id_discount;?>			    	
-				    	@endif
-		    		@endif	    		
-		    	@endforeach
+			    	@foreach($cDiscountxStudents as $mDiscountxStudents)
+			    		@if($mConcept->id == $mDiscountxStudents->id_concept)
+			    			@if($mDiscountxStudents->id_discount != $iLastindexDiscount)
+						    	<?php $i++;?>
+						    	<tr class="payment_discount_tr_class" >
+						    		<th scope="row">{!!$i!!}</th>
+						    		<td>{!!$mDiscountxStudents->name!!}</td>
+					    			<?php
+					    				$amountToPayRow = $mDiscountxStudents->amount;
+								    ?>
+								    <td>{!!"- S/. ".$amountToPayRow!!}</td>			    		
+						    	</tr>
+						    	<?php $iLastindexDiscount = $mDiscountxStudents->id_discount;?>			    	
+					    	@endif
+			    		@endif	    		
+			    	@endforeach
 		    	@endif
 		    	<?php 
 		    		if ($iamountRemaining==0) {

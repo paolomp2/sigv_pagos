@@ -70,6 +70,7 @@ class paymentController extends Controller
         $gc->entity_to_edit = Student::find($iId_student);
         $gc->concepts = $this->getConceptsbyStudentID($iId_student);
         $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student);
+        
         return view('cms.payment.receiptConsole', compact('gc','cDiscountxStudents','iAmountToPay'));        
     }
 
@@ -256,6 +257,12 @@ class paymentController extends Controller
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($view);
         return $pdf->stream('payment_'.$id_payment_document_md5.'.pdf');
+    }
+
+    public function createPaymentDocument()
+    {
+        $gc = new generalContainer;
+        return view('cms.payment.createPaymentDocument', compact('gc'));  
     }
 
     /**

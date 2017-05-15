@@ -47,7 +47,7 @@
           <li><a><i class="fa fa-money"></i> Realizar pagos<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu" style="display: none">
               <li><a href="/showListStudents/">Realizar pagos</a></li>
-              <!-- <li><a href="/consult_debts">Consultar Deudas</a></li> -->
+              <li><a href="/createPaymentDocument/">Ingreso manual de boletas</a></li>
             </ul>
           </li>
         </ul>

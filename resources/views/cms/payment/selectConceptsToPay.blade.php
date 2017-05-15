@@ -145,7 +145,8 @@ $(document).ready(function() {
 	        		if((iRemainingAmount)>=iAmoutPayable){
 	        			table.rows[i].cells[6].innerHTML = "S/. "+iAmoutPayable;
 	        			iAmoutPayable = 0;
-	        			break;
+	        			iRemainingAmount = 0;
+	        			
 	        		}else{
 	        			table.rows[i].cells[6].innerHTML = "S/. "+iRemainingAmount;
 	        			iAmoutPayable = iAmoutPayable - iRemainingAmount;

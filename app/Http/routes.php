@@ -65,6 +65,8 @@ Route::group(['middleware' => 'auth'], function (){
 	Route::post('/makePayment/', ['as'=>'payments.makePayment', 'uses' => 'paymentController@makePayment']);
 	Route::get('/printPaymentDocument/{id_document_md5}', ['uses' => 'paymentController@printPaymentDocument']);
 	Route::get('/printPaymentDocument_test/{id_document_md5}', ['uses' => 'paymentController@printPaymentDocument_test']);
+	Route::get('/createPaymentDocument/', ['uses' =>'paymentController@createPaymentDocument']);	
+
 	//SCHEDULES
 	/*Route::resource('schedules','scheduleController');
 	Route::get('/schedules/trash/trash', ['uses' =>'scheduleController@trash']);
