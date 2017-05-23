@@ -2,7 +2,7 @@
   $gc->select = true;
   $gc->default_buttons = false;
   $gc->table = true;
-  $gc->page_name = "Consolidado por aula";
+  $gc->page_name = "Ajuste de Pagos por Alumno por Aula";
   
 ?>
 
@@ -10,7 +10,7 @@
 
 @section('content')            
 
-{!!Form::open(['route'=>'reports.consolidatedDebtReport','method'=>'POST', 'class'=>'form-horizontal form-label-left'])!!}             
+{!!Form::open(['route'=>'updatePayments.ShowStudentsDebts','method'=>'POST', 'class'=>'form-horizontal form-label-left'])!!}             
   
   <div class="form-group">
     <label class="control-label col-md-3 col-sm-3 col-xs-12">Seleccione Aula</label>
@@ -26,13 +26,14 @@
   <div class="ln_solid"></div>
   <div class="form-group">
     <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-      <button type="submit" class="btn btn-success">Generar Reporte</button>
+      <button type="submit" class="btn btn-success">Mostrar Alumnos</button>
     </div>
   </div>
 
 </form>
 
 @if(count($gc->concepts)>0)
+
 <table id="list_table" class="display dataTable">
   <thead>
     <tr>
@@ -53,9 +54,12 @@
           $lastName = $row->fullname
         ?>
       @endif
-      @if($row->debt=-1)
+      @if($row->debt<0)
+        <td>-</td>
       @else
-      <td>{!!$row->debt!!}</td>
+      <td>
+        <input autofocus type="text" minlength="1" id="names" name="names" required="required" class="form-control col-md-7 col-xs-12" value={!!'"'.$row->debt.'"'!!}>
+      </td>
       @endif
     @endforeach
                   

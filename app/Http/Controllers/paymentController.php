@@ -265,6 +265,80 @@ class paymentController extends Controller
         return view('cms.payment.createPaymentDocument', compact('gc'));  
     }
 
+
+    //UPDATE PAYMENT
+    public function showClassrooms()
+    {
+        //get all classrooms
+        $cClassrooms = Group::where("classroom_flag",1)
+                            ->orderBy("year","desc")
+                            ->orderBy("identifier","asc")
+                            ->get();
+        $gc = new generalContainer;
+        $gc->classrooms = $cClassrooms;
+
+        return view('cms.payment.updatePayments.updatePayment', compact('gc'));
+    }
+
+    public function ShowStudentsDebts(Request $request)
+    {
+        //get all classrooms
+        $cClassrooms = Group::where("classroom_flag",1)
+                            ->orderBy("year","desc")
+                            ->orderBy("identifier","asc")
+                            ->get();
+        $gc = new generalContainer;
+        $gc->classrooms = $cClassrooms;
+
+        //get all Concepts
+        $sQuery = "select 
+                    c.id, c.name
+                from
+                    students s, conceptxstudent cxs, concepts c, groups g, studentxgroupxyear sxgxy
+                where
+                    s.id = cxs.id_student and
+                    c.id = cxs.id_concept and
+                    g.id = $request->classroom_id and
+                    sxgxy.id_group = g.id and
+                    sxgxy.id_student = s.id
+                Group by
+                    c.id
+                Order by
+                    c.id_concept_group asc,
+                    c.fecha_vencimiento asc";
+
+        $collection = DB::select(DB::raw($sQuery));
+
+        $gc->concepts = $collection;
+
+        //get all students x concept
+        $sQuery = "select 
+                    CONCAT(s.last_name,' ',s.maiden_name,', ',s.first_name) as fullname, 
+                    c.id,
+                    IF(cxs.already_paid=0,cxs.original_amount-cxs.total_paid,-1) as debt
+                from
+                    students s, conceptxstudent cxs, concepts c, groups g, studentxgroupxyear sxgxy
+                where
+                    s.id = cxs.id_student and
+                    c.id = cxs.id_concept and
+                    g.id = $request->classroom_id and
+                    sxgxy.id_group = g.id and
+                    sxgxy.id_student = s.id
+                Order by
+                    fullname,
+                    c.id_concept_group asc,
+                    c.fecha_vencimiento asc";
+
+        $collection = DB::select(DB::raw($sQuery));
+
+        $gc->consolidatedDebtReportGrid = $collection;
+
+        return view('cms.payment.updatePayments.updatePayment', compact('gc'));
+    }
+
+    //END UPDATE PAYMENT
+
+
     /**
      * Display a listing of the resource.
      *

@@ -59,6 +59,7 @@ Route::group(['middleware' => 'auth'], function (){
 	Route::get('/interests/{id_concept}/{id_group}/add_inactive', ['uses' =>'interestController@add_inactive']);
 	
 	//PAYMENTS
+	
 	Route::get('/showListStudents/', ['uses' =>'paymentController@showListStudents']);
 	Route::get('/getDebsList/{id_Student}', ['uses' => 'paymentController@showDebts']);
 	Route::post('/showReceiptConsole/', ['as'=>'payments.showReceiptConsole', 'uses' => 'paymentController@showReceiptConsole']);
@@ -66,6 +67,11 @@ Route::group(['middleware' => 'auth'], function (){
 	Route::get('/printPaymentDocument/{id_document_md5}', ['uses' => 'paymentController@printPaymentDocument']);
 	Route::get('/printPaymentDocument_test/{id_document_md5}', ['uses' => 'paymentController@printPaymentDocument_test']);
 	Route::get('/createPaymentDocument/', ['uses' =>'paymentController@createPaymentDocument']);	
+		//update Payments
+	Route::get('/updatePayments/showClassrooms', ['uses' =>'paymentController@showClassrooms']);
+	Route::post('/updatePayments/ShowStudentsDebts', ['as'=>'updatePayments.ShowStudentsDebts', 'uses' => 'paymentController@ShowStudentsDebts']);
+	Route::post('/updatePayments/SaveStudentsDebts', ['as'=>'updatePayments.SaveStudentsDebts', 'uses' => 'paymentController@SaveStudentsDebts']);
+
 
 	//SCHEDULES
 	/*Route::resource('schedules','scheduleController');
