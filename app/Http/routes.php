@@ -66,6 +66,7 @@ Route::group(['middleware' => 'auth'], function (){
 	Route::post('/makePayment/', ['as'=>'payments.makePayment', 'uses' => 'paymentController@makePayment']);
 	Route::get('/printPaymentDocument/{id_document_md5}', ['uses' => 'paymentController@printPaymentDocument']);
 	Route::get('/printPaymentDocument_test/{id_document_md5}', ['uses' => 'paymentController@printPaymentDocument_test']);
+		//create Payment
 	Route::get('/createPaymentDocument/', ['uses' =>'paymentController@createPaymentDocument']);	
 		//update Payments
 	Route::get('/updatePayments/showClassrooms', ['uses' =>'paymentController@showClassrooms']);
@@ -145,6 +146,10 @@ Route::group(['middleware' => 'auth'], function (){
 	Route::get('/reports/paymentsByDatesReportGet', ['uses' =>'reportController@paymentsByDatesReportGet']);
 	Route::post('/groups/paymentsByDatesReport', ['as'=>'reports.paymentsByDatesReport', 'uses' => 'reportController@paymentsByDatesReport']);
 	
+
+	//TESTS
+	Route::get('/Tests/CreatePaymentDocument/BasicDates_01', ['uses' =>'generatorController@BasicDates_01']);
+	Route::post('/Test/createPaymentDocument/GeneratePayments_02', ['as'=>'Test.createPaymentDocument.GeneratePayments_02', 'uses' => 'generatorController@CreateDocs_02']);
 });
 
 /*Event::listen('illuminate.query',function($query){

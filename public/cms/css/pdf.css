@@ -1,0 +1,94 @@
+@page { 
+	size: 21.6cm 15.2cm;
+	margin: 0cm;
+}
+
+*{
+	font-size: 14px;
+	font-family: Tahoma;
+}
+
+#Document{
+	page-break-after: always;
+	position: relative;
+	top: 0cm;
+
+}
+
+#Scale{
+	width: 3.2cm;
+	position: absolute;
+    top: 2.3cm;
+    right: 7.7cm;
+}
+
+#EmissionDate{
+	width: 3.2cm;
+	position: absolute;
+    top: 2.3cm;
+    right: 3.4cm;
+}
+
+#CorrelativeNumber{
+	width: 3.2cm;
+	position: absolute;
+    top: 2.3cm;
+    right: 0.0cm;
+}
+
+#StudentName{
+	width: 13cm;
+	position: absolute;
+    top: 4cm;
+    left: 1cm;
+    text-align: center;
+}
+
+#ClassroomName{
+	width: 6cm;
+	position: absolute;
+    top: 4cm;
+    left: 15cm;
+    text-align: center;
+}
+
+
+#StudentCode{
+	width: 3.2cm;
+	position: absolute;
+    bottom: 1cm;
+    left: 2.9cm;
+}
+#ExpirationDate{
+	width: 3.2cm;
+	position: absolute;
+    bottom: 1cm;
+    right: 8cm;
+}
+
+#DocumentBody{
+	width: 20cm;
+	height: 8.1cm;
+	position: absolute;
+    top: 5.5cm;
+    left: 1.2cm;
+}
+
+
+#DocumentLinesConcept{
+	width: 16.5cm;
+	padding-right: 1cm;
+}
+
+#DocumentLinesAmount{
+	width: 3.5cm;
+}
+
+#DocumentTotal{
+	width: 3.5cm;
+	position: absolute;
+    right: 0.5cm;
+    bottom: 1cm;
+    text-align: center;
+}
+

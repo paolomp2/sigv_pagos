@@ -11,8 +11,14 @@
 @extends('cms.templates.template')
 
 @section('content')
-	<div class="form-horizontal form-label-left">           
+	<div class="form-horizontal form-label-left">
 		
+		<div class="form-group">
+			<label class="control-label col-md-3 col-sm-3 col-xs-3">Número de Boleta*</label>
+			<div class="col-md-3 col-sm-3 col-xs-3">
+			  <input autofocus type="text" minlength="5" maxlength="50"  id="name" name="name" class="form-control col-md-7 col-xs-12" placeholder="Número de Boleta">
+			</div>			
+		</div>
 		<div class="form-group">
 		    <label class="control-label col-md-3 col-sm-3 col-xs-12">seleccione alumno*</label>
 		    <div class="col-md-6 col-sm-12 col-xs-12">

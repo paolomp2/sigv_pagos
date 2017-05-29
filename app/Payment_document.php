@@ -17,4 +17,9 @@ class Payment_document extends Model
     	return $this->belongsTo('sigc\Student','id_student')->first();
     }
 
+    public function Lines()
+    {
+    	return $this->hasMany('sigc\Payment_document_line', 'id_document_payment')->get();
+    }
+
 }

@@ -120,6 +120,23 @@
           </li>--> 
         </ul>
       </div>
+      <div class="menu_section">
+        <h3>TESTS</h3>
+        <ul class="nav side-menu">
+          <li><a><i class="fa fa-area-chart"></i> Pagos<span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu" style="display: none">
+              <li><a href="/Tests/CreatePaymentDocument/BasicDates_01">Crear Documentos</a></li>
+              <!--<li><a href="/reports/debtorReportGet">Top de deudores</a></li>-->
+            </ul>
+          </li>      
+          
+          <!--<li><a><i class="fa fa-users"></i> Grupos<span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu" style="display: none">
+              
+            </ul>
+          </li>--> 
+        </ul>
+      </div>
     </div>
     <!-- /sidebar menu -->
 

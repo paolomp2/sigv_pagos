@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use sigc\Http\Requests;
 use sigc\Http\Controllers\Controller;
+use sigc\Http\Containers\generalContainer;
 
 use sigc\Schedule;
 use sigc\Concept;
@@ -18,8 +19,8 @@ use sigc\conceptxinterest;
 use sigc\Interest;
 use sigc\Discount;
 
-use sigc\Payment_doc;
-use sigc\Payment_doc_detail;
+use sigc\Payment_document;
+use sigc\Payment_document_line;
 
 use Vinkla\Hashids\Facades\Hashids;
 use Auth;
@@ -34,91 +35,28 @@ use DB;
 
 class generatorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+    public function BasicDates_01(){
+        $gc = new generalContainer;
+        return view('Test.PaymentDocuments.01-BasicDates', compact('gc'));
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
     /**
     * This function creates all the payment docs in a period
     * @param date $date_ini initial date of the period
     * @param date $date_fin final date of the period
     */
-    public function create_docs($year,$amount,$date_ini,$date_end)
+    public function CreateDocs_02(Request $request)
     {   
+        $amount = $request->amount;
+        $date_ini = $request->date_start;
+        $date_end = $request->date_end;
         $date_ini = Carbon::createFromFormat("Y-m-d H:i:s", $date_ini." 00:00:00");
         $date_end = Carbon::createFromFormat("Y-m-d H:i:s", $date_end." 00:00:00");
+        $year = $date_ini->year;
+
+        echo "Fecha inicial:  ".$date_ini->toFormattedDateString()." <br>";
+        echo "Fecha Final:  ".$date_end->toFormattedDateString()." <br>";
+        echo "Monto:  $amount <br>";
 
         $arrayDatesForPay = $this->get_array_prob($date_ini,$date_end);
         $total_days=count($arrayDatesForPay)-1;
@@ -144,7 +82,7 @@ class generatorController extends Controller
                 and cxe.id_concept = c.id
                 and cxe.id_student = s.id
                 and cxe.already_paid = 0
-                and c.year = $year
+                and c.year >= $year
                 and cxe.deleted_at is null
                 and c.deleted_at is null
                 order by c.fecha_vigencia asc, s.prob_procrastination asc;";
@@ -157,17 +95,17 @@ class generatorController extends Controller
             if ($remaining_amount==0) {
                 break;
             }
-
-            $payment_doc = new Payment_doc;
-            $payment_doc->student_id = $row->id_student;
-            $payment_doc->date_sell = $arrayDatesForPay[rand(0,$total_days)];
-            $payment_doc->save();
+            $payment_document = new Payment_document;
+            $payment_document->id_student = $row->id_student;
+            $payment_document->date_sell = $arrayDatesForPay[rand(0,$total_days)];
+            $payment_document->save();
+            $payment_document->id_md5 = Hashids::encode($payment_document->id+1000);           
 
             //get the first id for subsequent verification
             if ($first_id_payment_doc==-1) {
-                $first_id_payment_doc=$payment_doc->id;
+                $first_id_payment_doc=$payment_document->id;
             }
-            $last_id_payment_doc=$payment_doc->id;
+            $last_id_payment_doc=$payment_document->id;
 
             $num_lines = 1;
 
@@ -176,8 +114,8 @@ class generatorController extends Controller
                 $num_lines++;
                 $rand = rand(1,100);
             }
-            echo "id del documento:  $payment_doc->id <br>";
-            echo "id del estudiante: $payment_doc->student_id <br>";
+            echo "id del documento:  $payment_document->id <br>";
+            echo "id del estudiante: $payment_document->id_student <br>";
             echo "# de líneas:       $num_lines <br>";
 
             //Id of the student of document
@@ -198,9 +136,9 @@ class generatorController extends Controller
                     $amount_line = $remaining_debt_row;
                     $flag_conceptxsudent_paid=true;
                 }
-                echo "$amount_line";
+                echo "$amount_line <br>";
                 //Updating the total amount for the payment document
-                $payment_doc->total_amount += $amount_line;
+                $payment_document->total_amount += $amount_line;
                 $remaining_amount-= $amount_line;
 
                 //Updating the total paid of studentxconcept
@@ -212,9 +150,10 @@ class generatorController extends Controller
                 $cxs->save();
 
                 //registering the line
-                $line = new Payment_doc_detail;
-                $line->id_payment_document = $payment_doc->id;
-                $line->id_conceptxstudent = $row->id;
+                $line = new Payment_document_line;
+                $line->id_document_payment = $payment_document->id;
+                $line->type_entity = 'CONCEPT';
+                $line->id_entity = $cxs->id_concept;
                 $line->amount = $amount_line;
                 $line->save();
 
@@ -256,18 +195,30 @@ class generatorController extends Controller
                 echo "<br><br>";
             }
 
-            $payment_doc->save();
+            $payment_document->save();
         }
 
-        $query="select sum(pdd.amount) as suma
-                from payment_document_details pdd 
-                where pdd.id_payment_document >= $first_id_payment_doc and pdd.id_payment_document <= $last_id_payment_doc;";
+        $query="select 
+                    sum(pdl.amount) as suma
+                from 
+                    payment_document_line pdl 
+                where 
+                    pdl.id_document_payment >= $first_id_payment_doc and 
+                    pdl.id_document_payment <= $last_id_payment_doc;";
 
         $total = DB::select(DB::raw($query));
         $total = $total[0];
         echo "first ID: $first_id_payment_doc <br>";
         echo "last ID: $last_id_payment_doc <br>";
         echo "<p>Total: $total->suma</p>";
+
+        $cPayment_document= payment_document::Where('id','>=',$first_id_payment_doc)->where('id','<=',$last_id_payment_doc)->get();       
+
+        //Print PDF
+        $view =  \View::make('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document'))->render();
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($view);
+        return $pdf->stream('payment_'.$date_ini->toFormattedDateString().'-'.$date_end->toFormattedDateString().'.pdf');
 
     }
 
@@ -300,11 +251,11 @@ class generatorController extends Controller
                     '24' => 1,
                     '25' => 1,
                     '26' => 1, 
-                    '27' => 1, 
-                    '28' => 1, 
-                    '29' => 7, 
-                    '30' => 9, 
-                    '31' => 8
+                    '27' => 2, 
+                    '28' => 2, 
+                    '29' => 3, 
+                    '30' => 3, 
+                    '31' => 3
                     );
         
         $holidays = array(  1 => '2014-01-01',

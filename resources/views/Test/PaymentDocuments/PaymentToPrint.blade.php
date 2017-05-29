@@ -5,8 +5,8 @@
     {!!Html::style('cms/css/pdf.css')!!}
   </head>
   <body> 
-    <div class="Document">
-      @foreach(cPayment_document as oPayment_document)
+    @foreach($cPayment_document as $oPayment_document)
+    <div id="Document">    
       <div id="DocumentHeader">
           <div id="EmissionDate">
             {{ $oPayment_document->date_sell }}                        
@@ -15,7 +15,7 @@
             Regular
           </div>    
           <div id="CorrelativeNumber">
-            {{ $oPayment_document->correlative_number}}
+            {{ $oPayment_document->id_md5}}
           </div>
           <div id="StudentName">
             <?php
@@ -27,6 +27,12 @@
             ?>
             {{ $student_name }}
           </div>
+          <div id="ClassroomName">
+            <?php             
+                $classroom_name = $oPayment_document->Student()->Classroom->name;
+            ?>
+            {{ $classroom_name }}
+          </div>
           <div id="StudentCode">
             {{ $oPayment_document->Student()->id +1002358 }}
           </div>
@@ -35,13 +41,12 @@
           </div>
       </div>
 
-      <div class="DocumentBody">
+      <div id = "DocumentBody">
 
         <table id = "DocumentLines">        
           <tbody>
-
+            <?php $cPayment_document_line = $oPayment_document->Lines(); ?>
             @foreach($cPayment_document_line as $mPayment_document_line)
-
             <tr>
               <?php
                 $name = "ERROR - - DOCUMENTTOPRINT.BLADE.PHP";
@@ -56,20 +61,18 @@
                 }
 
               ?>
-              <td class="DocumentLinesConcept">{{ $name }} </td>
-              <td class="DocumentLinesAmount">{{ $signal." S/.".number_format($mPayment_document_line->amount,2)}} </td>
+              <td id="DocumentLinesConcept">{{ $name }} </td>
+              <td id="DocumentLinesAmount">{{ $signal." S/.".number_format($mPayment_document_line->amount,2)}} </td>
             </tr>
             @endforeach
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2"></td>
-              <td>{{ " S/.".number_format($oPayment_document->total_amount,2) }}</td>
-            </tr>
-          </tfoot>
+          </tbody>          
         </table>
+        <div id = "DocumentTotal">
+          {{ " S/.".number_format($oPayment_document->total_amount,2) }}
+        </div>
       </div>
-      @endforeach    
+      
     </div>
+    @endforeach 
   </body>
 </html>

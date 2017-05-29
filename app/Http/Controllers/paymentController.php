@@ -229,21 +229,15 @@ class paymentController extends Controller
         $id_payment_document = Hashids::decode($id_payment_document_md5)[0]-1000;
         $oPayment_document= payment_document::find($id_payment_document);
         $cPayment_document_line = payment_document_line::where('id_document_payment',$oPayment_document->id)->get();
-
-        $data =  [
-            'quantity'      => '1' ,
-            'description'   => 'some ramdom text',
-            'price'   => '500',
-            'total'     => '500'
-        ];
-        $date = date('Y-m-d');
-        $invoice = "2222";
-
+        
         //Print PDF
-        $view =  \View::make('cms.payment.documentToPrint', compact('data', 'date', 'invoice','oPayment_document','cPayment_document_line'))->render();
+        $view =  \View::make('cms.payment.documentToPrint', compact('oPayment_document','cPayment_document_line'))->render();
         $pdf = \App::make('dompdf.wrapper');
+        $paper_size = array(0,0,100,100);
+        //$pdf->setPaper($paper_size);
+        $pdf->setPaper(500,500);
         $pdf->loadHTML($view);
-        return $pdf->download('payment_'.$id_payment_document_md5.'.pdf');
+        return $pdf->stream('payment_'.$id_payment_document_md5.'.pdf');
     }
 
     public function printPaymentDocument_test($id_payment_document_md5)
