@@ -32,4 +32,5 @@ class Student extends Model
         return $this->hasMany('sigc\studentxgroupxyear', 'id_student');
     }
 
+    
 }

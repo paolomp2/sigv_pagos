@@ -28,7 +28,7 @@ class classroomController extends Controller
      */
     public function index()
     {
-        $classrooms = Group::where('classroom_flag',1)->orderby('identifier')->get();
+        $classrooms = Group::where('classroom_flag',1)->orderby('year','desc')->orderby('identifier')->get();
         foreach ($classrooms as $classroom) {
             if($classroom->id_md5==""){
                 $classroom->id_md5 = Hashids::encode($classroom->id+1000);

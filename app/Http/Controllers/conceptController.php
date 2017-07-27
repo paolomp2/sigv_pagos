@@ -188,9 +188,9 @@ class conceptController extends Controller
         $concept->delete();
 
         //Destroy concepts x interest
-        conceptxinterest::where("concept_id",$concept_id)->delete();
+        //conceptxinterest::where("concept_id",$concept_id)->delete();
         //Destroy concepts x discount
-        conceptxdiscount::where("concept_id",$concept_id)->delete();
+        //conceptxdiscount::where("concept_id",$concept_id)->delete();
         //Destroy the relation between the concept and the student
         conceptxstudent::where("id_concept", $concept->id)->delete();
         return Redirect::to('/concepts');

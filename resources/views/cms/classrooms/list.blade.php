@@ -8,6 +8,7 @@
       <th>#</th>
       <th>Clasificación</th>
       <th>Nombre</th>
+      <th>year</th>
       <th>Capacidad</th>
       <th>Matriculados</th>
       <th>Opciones</th>
@@ -20,6 +21,7 @@
       <th scope="row">{!!$i!!}</th>
       <td>{!!$classroom->description!!}</td>
       <td>{!!$classroom->name!!}</td>
+      <td>{!!$classroom->year!!}</td>
       <td>{!!$classroom->capacity!!}</td>
       <td>{!!$classroom->num_people!!}</td>          
       

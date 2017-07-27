@@ -54,10 +54,6 @@ class generatorController extends Controller
         $date_end = Carbon::createFromFormat("Y-m-d H:i:s", $date_end." 00:00:00");
         $year = $date_ini->year;
 
-        echo "Fecha inicial:  ".$date_ini->toFormattedDateString()." <br>";
-        echo "Fecha Final:  ".$date_end->toFormattedDateString()." <br>";
-        echo "Monto:  $amount <br>";
-
         $arrayDatesForPay = $this->get_array_prob($date_ini,$date_end);
         $total_days=count($arrayDatesForPay)-1;
 
@@ -114,14 +110,9 @@ class generatorController extends Controller
                 $num_lines++;
                 $rand = rand(1,100);
             }
-            echo "id del documento:  $payment_document->id <br>";
-            echo "id del estudiante: $payment_document->id_student <br>";
-            echo "# de líneas:       $num_lines <br>";
-
             //Id of the student of document
             $id_student = $row->id_student;
             for ($i=0; $i < $num_lines; $i++) {
-                echo "    id Row: ";
                 //If the remaining_amount is less than the remaining amount of
                 //the relation between the the concept and the student
                 //then the document pyment line just take the diference
@@ -129,14 +120,12 @@ class generatorController extends Controller
                 $remaining_debt_row = $row->original_amount - $row->total_discount - $row->total_paid;
 
                 $flag_conceptxsudent_paid=false;
-                echo "$row->id    Monto:";
                 if( $remaining_amount < $remaining_debt_row){
                     $amount_line = $remaining_amount;
                 }else{
                     $amount_line = $remaining_debt_row;
                     $flag_conceptxsudent_paid=true;
                 }
-                echo "$amount_line <br>";
                 //Updating the total amount for the payment document
                 $payment_document->total_amount += $amount_line;
                 $remaining_amount-= $amount_line;
@@ -176,11 +165,9 @@ class generatorController extends Controller
                 //if more than one line then
                 //update the row
                 if ($i+1!=$num_lines) {
-                    echo "<br>cambiando<br>";
                     $finded = false;
                     foreach ($table as $key_next => $row_next) {
                         if ($row_next->id_student == $id_student) {
-                            echo "encontrado<br>";
                             $row = $row_next;
                             $key = $key_next;
                             $finded = true;
@@ -188,13 +175,10 @@ class generatorController extends Controller
                         }
                     }
                     if (!$finded) {
-                        echo "no encontrado<br>";
                         break;
                     }
                 }
-                echo "<br><br>";
             }
-
             $payment_document->save();
         }
 
@@ -208,17 +192,18 @@ class generatorController extends Controller
 
         $total = DB::select(DB::raw($query));
         $total = $total[0];
-        echo "first ID: $first_id_payment_doc <br>";
-        echo "last ID: $last_id_payment_doc <br>";
-        echo "<p>Total: $total->suma</p>";
 
-        $cPayment_document= payment_document::Where('id','>=',$first_id_payment_doc)->where('id','<=',$last_id_payment_doc)->get();       
+        $cPayment_document= payment_document::Where('id','>=',$first_id_payment_doc)
+                                            ->where('id','<=',$last_id_payment_doc)
+                                            ->OrderBy('date_sell')
+                                            ->get();       
 
+        //return view('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document')); 
         //Print PDF
         $view =  \View::make('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document'))->render();
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($view);
-        return $pdf->stream('payment_'.$date_ini->toFormattedDateString().'-'.$date_end->toFormattedDateString().'.pdf');
+        return $pdf->download('payment_'.$date_ini->toFormattedDateString().'-'.$date_end->toFormattedDateString().'.pdf');
 
     }
 
