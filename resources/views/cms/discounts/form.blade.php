@@ -17,13 +17,12 @@
   </div>
   
   @if($gc->create)
-  @include('cms.layouts.periodo')
   <div class="form-group">
     <label class="control-label col-md-3 col-sm-3 col-xs-12">Grupo de concepto al que se aplica</label>
     <div class="col-md-6 col-sm-9 col-xs-12">
       <select required="required" id="select_concept_group" name="select_concept_group" class="select2_single form-control col-md-12 col-sm-12 col-xs-12">
         @foreach($gc->concepts_groups as $concept_group)
-        <option id="{!!$concept_group->monto!!}" value="{!!$concept_group->id!!}">{!!$concept_group->name!!}</option>
+        <option id="{!!$concept_group->monto!!}" value="{!!$concept_group->id!!}">{!!$concept_group->year!!} - {!!$concept_group->name!!}</option>
         @endforeach
       </select>
     </div>

@@ -41,7 +41,7 @@
           <li><a><i class="fa fa-retweet"></i> Dstos e Intereses<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu" style="display: none">
               <li><a href="/discounts/">Descuentos</a></li>
-              <!-- <li><a href="/interests">Intereses</a></li> -->
+              <li><a href="/interests">Intereses</a></li>
             </ul>
           </li>
           <li><a><i class="fa fa-money"></i> Realizar pagos<span class="fa fa-chevron-down"></span></a>

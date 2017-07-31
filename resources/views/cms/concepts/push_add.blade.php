@@ -40,7 +40,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2 id="title_table">Lista de alumnos a registrar <small>Los alumnos no se registrarán hasta que de click en registrar</small></h2>
+                  <h2 id="title_table">Lista de Grupos de alumnos a registrar <small>Los grupos no se registrarán hasta que de click en registrar</small></h2>
                   
                   <div class="clearfix"></div>
                 </div>

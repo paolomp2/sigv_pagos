@@ -38,7 +38,7 @@ class conceptController extends Controller
      */
     public function index()
     {
-        $concepts = Concept::all();        
+        $concepts = Concept::orderBy("year","Desc")->orderBy("fecha_vigencia","Asc")->get();        
         $gc = new generalContainer;
         $gc->url_base = "concepts";;
         $gc->concepts = $concepts;

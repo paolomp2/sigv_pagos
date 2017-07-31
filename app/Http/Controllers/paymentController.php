@@ -41,8 +41,10 @@ class paymentController extends Controller
      */
     public function showListStudents()
     {
+        $config = Configuration::where('current',1)->first();
         $gc = new generalContainer;
-        $gc->students = Student::all();
+        $gc->students = Student::where("year",$config->year)->get();
+        //dd($gc->students);
         return view('cms.payment.showStudents', compact('gc'));
     }
 
@@ -57,8 +59,9 @@ class paymentController extends Controller
 
         $gc->concepts = $this->getConceptsbyStudentID($iId_student);
         $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student);
-
-        return view('cms.payment.selectConceptsToPay', compact('gc','cDiscountxStudents'));
+        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student);
+        
+        return view('cms.payment.selectConceptsToPay', compact('gc','cDiscountxStudents','cInterestxStudents'));
 
     }
     
@@ -70,8 +73,9 @@ class paymentController extends Controller
         $gc->entity_to_edit = Student::find($iId_student);
         $gc->concepts = $this->getConceptsbyStudentID($iId_student);
         $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student);
-        
-        return view('cms.payment.receiptConsole', compact('gc','cDiscountxStudents','iAmountToPay'));        
+        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student);
+
+        return view('cms.payment.receiptConsole', compact('gc','cDiscountxStudents', 'cInterestxStudents','iAmountToPay'));        
     }
 
     public function makePayment(Request $request)
@@ -84,6 +88,7 @@ class paymentController extends Controller
         $iPayment_document_total_to_pay = 0;
         $cConcepts = $this->getConceptsbyStudentID($iId_student);
         $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student);
+        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student);
         $iLastIdDiscount = -1;
         
         //create Payment Document
@@ -196,6 +201,7 @@ class paymentController extends Controller
     {
         $sQuery = "select 
                       c.id as id_concept,
+                      c.name as concept_name,
                        d.id as id_discount,
                        dxg.id_group,
                        d.id_md5, 
@@ -224,33 +230,51 @@ class paymentController extends Controller
                  return DB::select(DB::raw($sQuery));
     }
 
+    public function getInterestsByStudentOrderByConcept($iId_student)
+    {
+        $sQuery = "select i.id as id_interest, i.id_md5, c.id as id_concept, c.id_md5, c.name as concept_name, i.name, datediff(Now(),c.fecha_vencimiento) as days_diff,
+                        if(i.percentage_flag, datediff(Now(),c.fecha_vencimiento) * c.amount * i.amount / 100 , datediff(Now(),c.fecha_vencimiento) * i.amount) as amount
+                    from interests i, interestxgroup ixg, concept_groupsxinterest cgxi, concepts c
+                    where 
+                        i.id = ixg.id_interest and
+                        ixg.id_group in (
+                            select sxgxy.id_group
+                            from studentxgroupxyear sxgxy
+                            where sxgxy.id_student = $iId_student
+                        ) and
+                        c.id_concept_group = cgxi.id_concept_groups and
+                        cgxi.id_interest = i.id and
+                        i.deleted_at is null and
+                        c.deleted_at is null and
+                        ixg.deleted_at is null and
+                        cgxi.deleted_at is null";
+
+                 return DB::select(DB::raw($sQuery));
+    }
+
     public function printPaymentDocument($id_payment_document_md5){
         
         $id_payment_document = Hashids::decode($id_payment_document_md5)[0]-1000;
-        $oPayment_document= payment_document::find($id_payment_document);
-        $cPayment_document_line = payment_document_line::where('id_document_payment',$oPayment_document->id)->get();
+        $cPayment_document= payment_document::where("id",$id_payment_document)->get();       
         
         //Print PDF
-        $view =  \View::make('cms.payment.documentToPrint', compact('oPayment_document','cPayment_document_line'))->render();
+        $view =  \View::make('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document'))->render();
         $pdf = \App::make('dompdf.wrapper');
-        $paper_size = array(0,0,100,100);
-        //$pdf->setPaper($paper_size);
-        $pdf->setPaper(500,500);
         $pdf->loadHTML($view);
-        return $pdf->stream('payment_'.$id_payment_document_md5.'.pdf');
+        return $pdf->download('payment_'.$id_payment_document_md5.'.pdf');
     }
 
+    //Not Used
     public function printPaymentDocument_test($id_payment_document_md5)
     {
         $id_payment_document = Hashids::decode($id_payment_document_md5)[0]-1000;
-        $oPayment_document= payment_document::find($id_payment_document);
-        $cPayment_document_line = payment_document_line::where('id_document_payment',$oPayment_document->id)->get();
+        $cPayment_document= payment_document::where("id",$id_payment_document)->get();       
         
         //Print PDF
-        $view =  \View::make('cms.payment.documentToPrint', compact('oPayment_document','cPayment_document_line'))->render();
+        $view =  \View::make('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document'))->render();
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($view);
-        return $pdf->stream('payment_'.$id_payment_document_md5.'.pdf');
+        return $pdf->download('payment_'.$date_ini->toFormattedDateString().'-'.$date_end->toFormattedDateString().'.pdf');
     }
 
     public function createPaymentDocument()

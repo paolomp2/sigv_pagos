@@ -16,7 +16,7 @@
     </div>
   </div>
   <div class="form-group">
-    <label class="control-label col-md-3 col-sm-3 col-xs-12">Grupo de concepto al que se aplica</label>
+    <label class="control-label col-md-3 col-sm-3 col-xs-12">Grupo de concepto al que se aplicaa</label>
     <div class="col-md-6 col-sm-9 col-xs-12">
       <select required="required" id="select_concept_group" name="select_concept_group" class="select2_single form-control col-md-12 col-sm-12 col-xs-12">
         @foreach($gc->concepts_groups as $concept_group)
@@ -25,7 +25,7 @@
           if($gc->concepts_groups_id!=null)
             $selected = array_search($concept_group->id,$gc->concepts_groups_id);          
         ?>
-        <option @if($selected>-1) selected @endif id="{!!$concept_group->monto!!}" value="{!!$concept_group->id!!}">{!!$concept_group->name!!}</option>
+        <option @if($selected>-1) selected @endif id="{!!$concept_group->monto!!}" value="{!!$concept_group->id!!}">{!!$concept_group->year!!} - {!!$concept_group->name!!}</option>
         @endforeach
       </select>
     </div>
@@ -113,5 +113,5 @@
     }, function(start, end, label) {
       console.log(start.toISOString(), end.toISOString(), label);
     });
-  </script>
+  </script>y
 @endsection

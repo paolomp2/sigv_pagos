@@ -21,6 +21,7 @@ use Auth;
 
 use Redirect;
 
+use DB;
 class interestController extends Controller
 {
     /**
@@ -31,13 +32,6 @@ class interestController extends Controller
     public function index()
     {
         $interests = Interest::all();
-
-        foreach ($interests as $discount) {
-            if($discount->id_md5==""){
-                $discount->id_md5 = Hashids::encode($discount->id+1000);
-                $discount->save();
-            }
-        }
 
         $gc = new generalContainer;
         $gc->table = true;
@@ -57,6 +51,7 @@ class interestController extends Controller
      */
     public function create()
     {
+        $config = Configuration::where("current",1)->first();
         $gc = new generalContainer;
         $gc->create = true;
         $gc->select = true;
@@ -66,7 +61,7 @@ class interestController extends Controller
         $gc->url_base = "interests";
         $gc->entity_to_edit = new Interest;
         $gc->entity_to_edit->days_after_expiration_date=0;
-        $gc->concepts_groups = Concept_group::all();
+        $gc->concepts_groups = Concept_group::where("year",$config->year)->get();
         $gc->breadcrumb('interests.create');
         return view('cms.interests.form', compact('gc'));
     }
@@ -88,16 +83,8 @@ class interestController extends Controller
         $interest->concept_group = $request->select_concept_group;
         $interest->save();
 
-        //select all concept and add interest to concept
-        $concepts = Concept::where("id_concepto_grupo",$request->select_concept_group)->get();
-
-        foreach ($concepts as $concept) {
-            $conceptxinterest = new conceptxinterest;
-            $conceptxinterest->concept_id = $concept->id;
-            $conceptxinterest->expiration_date = $concept->fecha_vencimiento;
-            $conceptxinterest->interest_id = $interest->id;
-            $conceptxinterest->save();
-        }
+        $interest->id_md5 = Hashids::encode($interest->id+1000);
+        $interest->save();
 
         return Redirect::to('/interests');
     }
@@ -121,7 +108,7 @@ class interestController extends Controller
      */
     public function edit($id)
     {
-
+        $config = Configuration::where("current",1)->first();
         $gc = new generalContainer;
         $gc->select = true;
         $gc->form = true;
@@ -129,7 +116,7 @@ class interestController extends Controller
         $gc->page_description = "Modifique los campos requeridos";
         $gc->url_base = "interests";
         $gc->entity_to_edit = Interest::find(Hashids::decode($id)[0]-1000);
-        $gc->concepts_groups = Concept_group::all();        
+        $gc->concepts_groups = Concept_group::where("year",$config->year)->get();     
         $gc->concepts_groups_id = $gc->entity_to_edit->Concepts_groups()->getRelatedIds()->toArray();
         /*echo dd($gc->concepts_groups_id->toArray());*/
 
@@ -231,7 +218,7 @@ class interestController extends Controller
         return Redirect::to('interests/trash/trash');
     }
 
-    public function add_show($id)
+    public function list_groups($id)
     {
         $interest = Interest::find(Hashids::decode($id)[0]-1000);
         if(is_null($interest))
@@ -252,25 +239,38 @@ class interestController extends Controller
                                 })->get();
         //echo dd($gc->groups);
         $gc->url_base="interests";
-        return view('cms.discounts.list_add', compact('gc'));
+        return view('cms.interests.list_add', compact('gc'));
     }
 
     public function add_elements($id)
     {
-        $discount = Interest::find(Hashids::decode($id)[0]-1000);
-        if(is_null($discount))
+        $interest = Interest::find(Hashids::decode($id)[0]-1000);
+        if(is_null($interest))
         {
             return Redirect::to('interests/');
         }
+        $config = Configuration::where('current',1)->first();
 
         $gc = new generalContainer;
         $gc->trash = true;
         $gc->table = true;
         $gc->select = true;
-        $gc->page_name = "Interés: ".$discount->name;
+        $gc->page_name = "Interés: ".$interest->name;
         $gc->page_description = "Seleccione los grupos y luego de click en confirmar";
-        $gc->entity_to_edit = $discount;
-        $gc->groups_students = Group::all();
+        $gc->entity_to_edit = $interest;
+        $sQuery = " select g.* 
+                    from groups g, conceptxgroup cxg
+                    where
+                        g.id = cxg.id_group and
+                        cxg.id_concept in (
+                            select c.id
+                            from concepts c
+                            where
+                                c.id_concept_group = $interest->concept_group
+                        )
+                    group by id
+                    ;";
+        $gc->groups_students = DB::select(DB::raw($sQuery));
         $gc->url_base="interests";
         return view('cms.concepts.push_add', compact('gc'));
     }

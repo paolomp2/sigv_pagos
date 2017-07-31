@@ -6,7 +6,7 @@
   </head>
   <body> 
     <div class="Document">
-      @foreach(cPayment_document as oPayment_document)
+      @foreach($cPayment_document as $oPayment_document)
       <div id="DocumentHeader">
           <div id="EmissionDate">
             {{ $oPayment_document->date_sell }}                        

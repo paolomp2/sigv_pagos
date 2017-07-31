@@ -23,6 +23,7 @@ use Redirect;
 
 use Carbon\Carbon;
 
+use DB;
 class discountController extends Controller
 {
     /**
@@ -59,6 +60,7 @@ class discountController extends Controller
      */
     public function create()
     {
+        $config = Configuration::where("current",1)->first();
         $gc = new generalContainer;
         $gc->create = true;
         $gc->select = true;
@@ -67,7 +69,7 @@ class discountController extends Controller
         $gc->page_description = "Inserte los campos requeridos";
         $gc->entity_to_edit = new Discount;
         $gc->entity_to_edit->days_after_expiration_date=0;
-        $gc->concepts_groups = Concept_group::all();
+        $gc->concepts_groups = Concept_group::where("year",$config->year)->get();
         $gc->discounts = Discount::all();
         $gc->breadcrumb('discounts.create');
         $gc->configurations = Configuration::all();
@@ -82,20 +84,23 @@ class discountController extends Controller
      */
     public function store(Request $request)
     {
-
+        $oConceptGroupSelected = Concept_group::find($request->select_concept_group);
         $discount = new Discount;
         $discount->name = $request->name;
         $discount->amount = $request->amount;
         $discount->percentage_flag = $request->radio_button_porcentage; 
         $discount->id_concept_group = $request->select_concept_group;
-        $discount->year = $request->selected_year;
         $discount->save();
 
         if($request->radio_button_flag_before_after==0)
             $request->days_bef_aft=$request->days_bef_aft*-1;
 
         $discount->days_after_expiration_date = $request->days_bef_aft;
-        $discount->save();        
+        $discount->save();
+
+        $discount->year = $oConceptGroupSelected->year;
+        $discount->id_md5 = Hashids::encode($discount->id+1000);
+        $discount->save();
 
         return Redirect::to('/discounts');
     }
@@ -225,14 +230,15 @@ class discountController extends Controller
 
         $gc->groups = Group::whereHas('discountxgroup', function($q) use($discount){
                                     $q->where('id_discount', $discount->id);
-                                })->get();
-        //echo dd($gc->groups);
+                                })->orderBy("year","Desc")->get();
         $gc->url_base="discounts";
         return view('cms.discounts.list_add', compact('gc'));
     }
 
     public function add_elements($id)
     {
+        $config = Configuration::where('current',1)->first();
+
         $discount = Discount::find(Hashids::decode($id)[0]-1000);
         if(is_null($discount))
         {
@@ -246,7 +252,21 @@ class discountController extends Controller
         $gc->page_name = "Descuento: ".$discount->name;
         $gc->page_description = "Seleccione los grupos y luego de click en confirmar";
         $gc->entity_to_edit = $discount;
-        $gc->groups_students = Group::all();
+        
+        $sQuery = " select g.* 
+                    from groups g, conceptxgroup cxg
+                    where
+                        g.id = cxg.id_group and
+                        cxg.id_concept in (
+                            select c.id
+                            from concepts c
+                            where
+                                c.id_concept_group = $discount->id_concept_group
+                        )
+                    group by id
+                    ;";
+        $gc->groups_students = DB::select(DB::raw($sQuery));
+        
         $gc->url_base="discounts";
         return view('cms.concepts.push_add', compact('gc'));
     }
