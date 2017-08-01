@@ -89,7 +89,7 @@ class paymentController extends Controller
         $cConcepts = $this->getConceptsbyStudentID($iId_student);
         $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student);
         $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student);
-        $iLastIdDiscount = -1;
+        
         
         //create Payment Document
         $mPayment_document_group = payment_document_group::find(1);
@@ -103,8 +103,9 @@ class paymentController extends Controller
         $mpayment_document->id_md5 = Hashids::encode($mpayment_document->id+1000);
         $mpayment_document->save();
 
-        foreach ($cConcepts as $iIndexConcept => $oConcepts) {
-            
+        $cPayment_document_line_to_pay = array();
+        foreach ($cConcepts as $oConcepts) {
+            $iLastIdDiscount = -1;
             $mpayment_document_line_document = new payment_document_line();
             $mpayment_document_line_document->id_entity = $oConcepts->id;
             $mpayment_document_line_document->expiration_date = $oConcepts->fecha_vencimiento;
@@ -112,20 +113,23 @@ class paymentController extends Controller
             $mpayment_document_line_document->save();
 
             $iTotalDiscountXConcept = 0;
-            $iFlagAlreadyPaid = 0;
-            $cPayment_document_line_to_pay = array();
-            foreach ($cDiscountxStudents as $iIndexDiscount => $oDiscountxStudents) {
+            $iFlagAlreadyPaid = 0;            
+            $mpayment_document_line_discount = null;            
+
+            foreach ($cDiscountxStudents as $oDiscountxStudents) {
+                
                 if ($oDiscountxStudents->id_concept==$oConcepts->id && $iLastIdDiscount != $oDiscountxStudents->id_discount) {
+                    
                     $iTotalDiscountXConcept+=$oDiscountxStudents->amount;
                     $iLastIdDiscount = $oDiscountxStudents->id_discount;
 
-                    $mpayment_document_line = new payment_document_line();
-                    $mpayment_document_line->type_entity = 'DISCOUNT';
-                    $mpayment_document_line->id_entity = $oDiscountxStudents->id_discount;
-                    $mpayment_document_line->amount = $oDiscountxStudents->amount;
-                    $mpayment_document_line->expiration_date = $oConcepts->fecha_vencimiento;
-                    $mpayment_document_line->id_document_payment = $mpayment_document->id;
-                    array_push($cPayment_document_line_to_pay, $mpayment_document_line);                    
+                    $mpayment_document_line_discount = new payment_document_line();
+                    $mpayment_document_line_discount->type_entity = 'DISCOUNT';
+                    $mpayment_document_line_discount->id_entity = $oDiscountxStudents->id_discount;
+                    $mpayment_document_line_discount->amount = $oDiscountxStudents->amount;
+                    $mpayment_document_line_discount->expiration_date = $oConcepts->fecha_vencimiento;
+                    $mpayment_document_line_discount->id_document_payment = $mpayment_document->id;
+                    array_push($cPayment_document_line_to_pay,$mpayment_document_line_discount);                    
                 }                
             }
             $iAmountToPay+=$iTotalDiscountXConcept;
@@ -139,8 +143,8 @@ class paymentController extends Controller
 
                 //IF THE TOTAL AMOUNT TO PAY IS MORE THAN THE DIFF BETWEEN THE CONCEPT AMOUNT AND THE SUM OF DISCOUNT
                 //THEN I CAN APPLY THE DISCOUNT
-                foreach ($cPayment_document_line_to_pay as $mpayment_document_line) {
-                   $mpayment_document_line->save();
+                foreach ($cPayment_document_line_to_pay as $mpayment_document_line_discount) {
+                   $mpayment_document_line_discount->save();
                 }
                 
             }else{
@@ -166,6 +170,7 @@ class paymentController extends Controller
             $mConceptXstudent->already_paid = $iFlagAlreadyPaid;
             $mConceptXstudent->save();
         }
+        //dd($cPayment_document_line_to_pay);
         //UPDATTING THE TOTAL AMOUNT
         $mpayment_document->status = config('CONSTANTS.PAID_OUT');
         $mpayment_document->total_amount = $iPayment_document_total_to_pay;

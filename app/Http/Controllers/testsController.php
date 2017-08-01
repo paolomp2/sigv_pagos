@@ -128,4 +128,9 @@ class testsController extends Controller
     {
         
     }
+
+    public function white($value='')
+    {
+        return view('white'); 
+    }
 }

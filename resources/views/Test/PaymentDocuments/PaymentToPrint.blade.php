@@ -55,6 +55,10 @@
                   $name = $mPayment_document_line->getConcept()->name;
                 }
 
+                if ($mPayment_document_line->type_entity=='INTEREST') {
+                  $name = $mPayment_document_line->getConcept()->name;
+                }
+
                 if ($mPayment_document_line->type_entity=='DISCOUNT') {
                   $name = $mPayment_document_line->getDiscount()->name;
                   $signal = "-";

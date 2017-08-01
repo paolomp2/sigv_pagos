@@ -164,4 +164,6 @@ Route::get('/test_payment/{year}/{amount}/{date_ini}/{date_end}', ['uses' =>'gen
 
 Route::get('/apply_discount_to_group/{id_discount}/{id_group}/{flag}', ['uses' =>'scheduleController@apply_discount_to_group']);
 
+Route::get('/white', ['uses' =>'testsController@white']);
+
 ?>
