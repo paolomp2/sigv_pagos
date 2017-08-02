@@ -56,7 +56,7 @@
                 }
 
                 if ($mPayment_document_line->type_entity=='INTEREST') {
-                  $name = $mPayment_document_line->getConcept()->name;
+                  $name = $mPayment_document_line->getInterest()->name;
                 }
 
                 if ($mPayment_document_line->type_entity=='DISCOUNT') {

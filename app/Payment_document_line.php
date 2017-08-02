@@ -21,4 +21,9 @@ class Payment_document_line extends Model
     {
     	return $this->belongsTo('sigc\Discount','id_entity')->first();
     }
+
+    public function getInterest()
+    {
+        return $this->belongsTo('sigc\Interest','id_entity')->first();
+    }
 }

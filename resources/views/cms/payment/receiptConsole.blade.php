@@ -75,9 +75,9 @@
 			    		
 		    		?>
 		      <?php
-		      	if ($iamountRemaining >= ($mConcept->amount)){
-		      		$amountToPayRow = $mConcept->amount;
-		      		$iamountRemaining -= $mConcept->amount;
+		      	if ($iamountRemaining >= ($mConcept->amount - $mConcept->total_paid)){
+		      		$amountToPayRow = $mConcept->amount - $mConcept->total_paid;
+		      		$iamountRemaining -= ($mConcept->amount - $mConcept->total_paid);
 		      		$bApplyDiscounts = true;
 		      	}else{
 		      		$iamountRemaining -= $iTotalDiscount;
@@ -94,7 +94,13 @@
 
 		    		@if($oInterestxStudents->amount > 0)
 		    			@if($oInterestxStudents->id_concept == $mConcept->id)
-		    				<?php $i++;?>
+		    				<?php 
+		    					if ($iamountRemaining==0) 
+		    					{
+					      			break;
+					      		}
+		    					$i++;
+		    				?>
 		    				<tr class="payment_interest_tr_class" >
 					    		<th scope="row">{!!$i!!}</th>
 					    		<td>{!!$oInterestxStudents->name!!} - {!!$oInterestxStudents->concept_name!!}</td>
@@ -108,7 +114,7 @@
 							      	}
 							    ?>
 							    <td>{!!"S/. ".$amountToPayRow!!}</td>			    		
-					    	</tr>
+					    	</tr>					    	
 		    			@endif
 		    		@endif
 		    	@endforeach

@@ -60,7 +60,7 @@ class paymentController extends Controller
         $gc->concepts = $this->getConceptsbyStudentID($iId_student);
         $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student);
         $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student);
-        
+        //dd($cInterestxStudents);
         return view('cms.payment.selectConceptsToPay', compact('gc','cDiscountxStudents','cInterestxStudents'));
 
     }
@@ -114,7 +114,7 @@ class paymentController extends Controller
 
             $iTotalDiscountXConcept = 0;
             $iFlagAlreadyPaid = 0;            
-            $mpayment_document_line_discount = null;            
+            $mpayment_document_line_discount = null;
 
             foreach ($cDiscountxStudents as $oDiscountxStudents) {
                 
@@ -132,6 +132,7 @@ class paymentController extends Controller
                     array_push($cPayment_document_line_to_pay,$mpayment_document_line_discount);                    
                 }                
             }
+
             $iAmountToPay+=$iTotalDiscountXConcept;
             
             $oConcepts->amount -= $oConcepts->total_paid;
@@ -167,8 +168,40 @@ class paymentController extends Controller
 
             $mConceptXstudent->total_paid = $iAmountToPayXConcept;
             $mConceptXstudent->total_discount = $iTotalDiscountXConcept;
+            
+            foreach ($cInterestxStudents as $oInterestxStudents) {
+
+                if ($oInterestxStudents->id_concept == $oConcepts->id ) {
+
+                    if ($iAmountToPay==0) {
+                        $iFlagAlreadyPaid = 0;
+                        break;
+                    }
+
+                    $mpayment_document_line_discount = new payment_document_line();
+                    $mpayment_document_line_discount->type_entity = 'INTEREST';
+                    $mpayment_document_line_discount->id_entity = $oInterestxStudents->id_interest;
+                    
+                    if($iAmountToPay>$oInterestxStudents->amount){
+                        $mpayment_document_line_discount->amount = $oInterestxStudents->amount;
+                        $iAmountToPay-=$oInterestxStudents->amount;
+                    }else{
+                        $mpayment_document_line_discount->amount = $iAmountToPay;
+                        $iAmountToPay = 0;
+                    }
+                    $iPayment_document_total_to_pay+=$mpayment_document_line_discount->amount;
+
+                    $mpayment_document_line_discount->id_document_payment = $mpayment_document->id;
+                    $mpayment_document_line_discount->save();
+                }
+            }
+
             $mConceptXstudent->already_paid = $iFlagAlreadyPaid;
             $mConceptXstudent->save();
+
+            if ($iAmountToPay==0) {
+                break;
+            }
         }
         //dd($cPayment_document_line_to_pay);
         //UPDATTING THE TOTAL AMOUNT
