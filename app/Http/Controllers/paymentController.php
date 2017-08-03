@@ -315,18 +315,34 @@ class paymentController extends Controller
         return $pdf->download('payment_'.$date_ini->toFormattedDateString().'-'.$date_end->toFormattedDateString().'.pdf');
     }
 
+    //CREATE DOCUMENT
     public function createPaymentDocument()
     {
-        $gc = new generalContainer;
-        return view('cms.payment.createPaymentDocument', compact('gc'));  
+        $config = Configuration::where("current",1)->first();
+
+        $cStudents = Student::where("year",$config->year)->orderBy("identifier","Asc")->get();
+        return view('cms.payment.createPaymentDocument.createPaymentDocument', compact('cStudents'));  
+    }
+
+    public function getDebsListWithOutDateLimit($id_md5)
+    {
+
+        $id_student = Hashids::decode($id_md5)[0]-1000;
+        $cConcepts = $this->getConceptsbyStudentID($id_student);
+        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($id_student);
+        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($id_student);
+
+        return view('cms.payment.createPaymentDocument.selectConceptsToPay', compact('cConcepts','cDiscountxStudents','cInterestxStudents','id_student'));  
     }
 
 
     //UPDATE PAYMENT
     public function showClassrooms()
     {
+        $config = Configuration::where("current",1)->first();
         //get all classrooms
         $cClassrooms = Group::where("classroom_flag",1)
+                            ->where("year",$config->year)
                             ->orderBy("year","desc")
                             ->orderBy("identifier","asc")
                             ->get();

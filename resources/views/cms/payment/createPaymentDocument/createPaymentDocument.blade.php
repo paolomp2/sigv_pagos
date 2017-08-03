@@ -1,4 +1,8 @@
 <?php
+	use sigc\Http\Containers\generalContainer;
+
+	$gc = new generalContainer;
+
 	if(is_null($gc)){
 		dd("Error - General Container not found");
 	}
@@ -16,17 +20,16 @@
 		<div class="form-group">
 			<label class="control-label col-md-3 col-sm-3 col-xs-3">Número de Boleta*</label>
 			<div class="col-md-3 col-sm-3 col-xs-3">
-			  <input autofocus type="text" minlength="5" maxlength="50"  id="name" name="name" class="form-control col-md-7 col-xs-12" placeholder="Número de Boleta">
+			  <input autofocus type="number" minlength="5" maxlength="50"  id="name" name="name" class="form-control col-md-7 col-xs-12" placeholder="Número de Boleta">
 			</div>			
 		</div>
 		<div class="form-group">
 		    <label class="control-label col-md-3 col-sm-3 col-xs-12">seleccione alumno*</label>
 		    <div class="col-md-6 col-sm-12 col-xs-12">
 		      <select onchange="ChangeID()"  id="student" name="student" class="select2_single form-control">
-		        @foreach($gc->students as $student)
+		        @foreach($cStudents as $student)
 		        	<option value="{!!$student->id_md5!!}">
-		        		{!!$student->last_name!!}{!!" "!!}{!!$student->maiden_name!!}{!!","!!}
-		        		{!!$student->first_name!!}{!!" "!!}{!!$student->middle_name!!}
+		        		{!!$student->full_name!!}
 					</option>
 		        @endforeach
 		      </select>
@@ -36,7 +39,7 @@
 		<div class="ln_solid"></div>
 		<div class="form-group">
 			<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-			  <button type="submit" class="btn btn-success">Guardar</button>
+			  <a id="students" href="/getDebsListWithOutDateLimit/{!!$cStudents[0]->id_md5!!}" class="btn btn-success">Continuar</a>
 			</div>
 		</div>
 
@@ -44,4 +47,16 @@
 @endsection
 
 @section('scripts')
+<script >
+	$(document).ready(function() {
+      $(".select2_single").select2();  
+    });
+    function ChangeID() {
+      //capturar select
+      var e = document.getElementById("student");
+      //capturar monto del grupo
+      var id = e.options[e.selectedIndex].value;      
+      document.getElementById("students").href="/getDebsListWithOutDateLimit/"+id; 
+    }
+</script>
 @endsection
