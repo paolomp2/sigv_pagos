@@ -324,15 +324,19 @@ class paymentController extends Controller
         return view('cms.payment.createPaymentDocument.createPaymentDocument', compact('cStudents'));  
     }
 
-    public function getDebsListWithOutDateLimit($id_md5)
+    public function getDebsListWithOutDateLimit(Request $request)
     {
+        $payment_document_number = $request->payment_document_number;
+        $id_md5 = $request->student;
+        $creation_date = $request->creation_date;
 
         $id_student = Hashids::decode($id_md5)[0]-1000;
+        $oStudent = Student::find($id_student);
         $cConcepts = $this->getConceptsbyStudentID($id_student);
         $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($id_student);
         $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($id_student);
 
-        return view('cms.payment.createPaymentDocument.selectConceptsToPay', compact('cConcepts','cDiscountxStudents','cInterestxStudents','id_student'));  
+        return view('cms.payment.createPaymentDocument.selectConceptsToPay', compact('cConcepts','cDiscountxStudents','cInterestxStudents','oStudent','payment_document_number','creation_date'));  
     }
 
 

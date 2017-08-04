@@ -3,7 +3,7 @@
 
 	$gc = new generalContainer;
 
-    $gc->page_name = "Page Name";
+    $gc->page_name = $oStudent->full_name;
     $gc->default_buttons = false;
     $gc->add_buttons = false;
     $gc->select = true;
@@ -13,7 +13,19 @@
 
 @extends('cms.templates.template')
 
-@section('content')	
+@section('content')
+{!!Form::open(['route'=>'payments.showReceiptConsole','method'=>'POST', 'class'=>'form-horizontal form-label-left', 'id'=>'form'])!!}    
+
+	<div class="form-group">
+		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Número de Documento :
+		</label>
+		<div class="col-md-6 col-sm-6 col-xs-12">
+			<input autofocus type="text" minlength="5" id="name" name="name" readonly="" class="form-control col-md-7 col-xs-12" value={!!$payment_document_number!!}>
+		</div>
+	</div>
+
+	<div class="ln_solid"></div>
+
 	<table id="list_table" class="display dataTable">
 	  <thead>
 	    <tr>
@@ -45,15 +57,15 @@
 	      <td>{!!"S/. ".$mConcept->total_paid!!}</td>
 
 	      <td><div class="col-md-12 col-sm-12 col-xs-12">
-		      <input autofocus type="number" min="1" id={!!"concept_".$mConcept->id_md5!!} name="amountToPay" required="required" class="form-control col-md-7 col-xs-12">
+		      <input autofocus type="number" min="1" id={!!"concept_".$mConcept->id_md5!!} class="form-control col-md-7 col-xs-12 amountToPay">
 		    </div></td>
 
 	      <td><div class="col-md-12 col-sm-12 col-xs-12">
-		      <input autofocus type="number" min="1" id={!!"discount_".$mConcept->id_md5!!} name="amountToPay" required="required" class="form-control col-md-7 col-xs-12">
+		      <input autofocus type="number" min="1" id={!!"discount_".$mConcept->id_md5!!} class="form-control col-md-7 col-xs-12 amountToPay">
 		    </div></td>
 
 	      <td><div class="col-md-12 col-sm-12 col-xs-12">
-		      <input autofocus type="number" min="1" id={!!"interest_".$mConcept->id_md5!!} name="amountToPay" required="required" class="form-control col-md-7 col-xs-12">
+		      <input autofocus type="number" min="1" id={!!"interest_".$mConcept->id_md5!!} class="form-control col-md-7 col-xs-12 amountToPay">
 		    </div></td>	      
 
 	      <td id={!!"total_".$mConcept->id_md5!!}>{!!"S/. "."0"!!}</td>         
@@ -65,64 +77,40 @@
 	  </tbody>
 	</table>
 
-	{!!Form::open(['route'=>'payments.showReceiptConsole','method'=>'POST', 'class'=>'form-horizontal form-label-left', 'id'=>'form'])!!}             
-		<div class="ln_solid"></div>
-		<div class="form-group">
-			<div id="request">
-			</div>
-			<input name="id_student" type="hidden" value = "{!!$id_student!!}">
-			<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-			  <button type="submit" class="btn btn-success">Continuar</button>
-			</div>
+	         
+	<div class="ln_solid"></div>
+	<div class="form-group">
+		<div id="request">
 		</div>
+		<input name="id_student" type="hidden" value = "{!!$oStudent->id!!}">
+		<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+		  <button type="submit" class="btn btn-success">Continuar</button>
+		</div>
+	</div>
 
-	</form>
+</form>
 @endsection
 
 @section('scripts')
 <script >
 $(document).ready(function() { 
 	
-	$("#amountToPay").bind('keypress', function(e) {
+	$(".amountToPay").bind('keypress', function(e) {		
 	    if(e.which == 13) {
-	    	
+	    	event.preventDefault();
+
+	    	var sId_md5 = e["currentTarget"]["attributes"][3]["nodeValue"].replace('concept_','');
+	    	var dAmount = $("#concept_"+sId_md5).val();
+
+	    	console.log(sId_md5);
+	    	console.log(dAmount);
+
+	    	var index = $('.inputs').index(this) + 1;
+         	$('.inputs').eq(index).focus();
+
 	    }
-	}
-
-	//calculate the total discount amount
-	var table = document.getElementById("list_table");
-	var iRowConceptToEdit = 0;
-	var iDiscountAcumulated = 0;
-	var iInterestAcumulated = 0;
-	var bDiscountReade = false;
-	var iCountTrOnTable = document.getElementById("list_table").getElementsByTagName("tr").length;
-	//row[0] is the header
-	for (var i = 1, row; row = table.rows[i]; i++) {
-		var classname = table.rows[i].className;
-		if(classname.split(/[ ,]+/)[0]=="payment_concept_tr_class"){			
-			if(iRowConceptToEdit>0){
-				document.getElementById("a_discount_"+iRowConceptToEdit).innerHTML = document.getElementById("a_discount_"+iRowConceptToEdit).innerHTML.replace("#",iDiscountAcumulated);
-				document.getElementById("a_interest_"+iRowConceptToEdit).innerHTML = document.getElementById("a_interest_"+iRowConceptToEdit).innerHTML.replace("#",iInterestAcumulated);
-			}
-			iRowConceptToEdit++;
-			iDiscountAcumulated = 0;
-			iInterestAcumulated = 0;
-			//CASE: THE CONCETP IS THE LAST ROW IN THE TABLE, THEN THE TOTAL DISCOUNT VALUE SHOULD BE REPLACED BY ZERO
-			if(i == (iCountTrOnTable-1)){
-				document.getElementById("a_discount_"+iRowConceptToEdit).innerHTML = document.getElementById("a_discount_"+iRowConceptToEdit).innerHTML.replace("#",iDiscountAcumulated);
-				document.getElementById("a_interest_"+iRowConceptToEdit).innerHTML = document.getElementById("a_interest_"+iRowConceptToEdit).innerHTML.replace("#",iInterestAcumulated);
-			}
-		}else{
-			iDiscountAcumulated += parseInt(table.rows[i].cells[3].innerHTML.split(/[ ,]+/)[1]);
-			iInterestAcumulated += parseInt(table.rows[i].cells[4].innerHTML.split(/[ ,]+/)[1]);
-
-			if(iRowConceptToEdit>0 && i == (iCountTrOnTable-1)){
-				document.getElementById("a_discount_"+iRowConceptToEdit).innerHTML = document.getElementById("a_discount_"+iRowConceptToEdit).innerHTML.replace("#",iDiscountAcumulated);
-				document.getElementById("a_interest_"+iRowConceptToEdit).innerHTML = document.getElementById("a_interest_"+iRowConceptToEdit).innerHTML.replace("#",iInterestAcumulated);
-			}
-
-		}
-	}
+	})
+	
 
 	document.getElementById("form").addEventListener("submit", prepareRequest);
 	function prepareRequest(){		
