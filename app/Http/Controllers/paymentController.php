@@ -339,6 +339,16 @@ class paymentController extends Controller
         return view('cms.payment.createPaymentDocument.selectConceptsToPay', compact('cConcepts','cDiscountxStudents','cInterestxStudents','oStudent','payment_document_number','creation_date'));  
     }
 
+    public function saveDocumentPayment(Request $request)
+    {
+        $document_number = $request->document_number;
+        $document_date = $request->document_date;
+        $document_amount = $request->document_amount;
+        $id_student = $request->id_student;        
+        $concepts = json_decode($request->concepts);
+        
+    }
+
 
     //UPDATE PAYMENT
     public function showClassrooms()

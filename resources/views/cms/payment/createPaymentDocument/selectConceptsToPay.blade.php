@@ -14,15 +14,35 @@
 @extends('cms.templates.template')
 
 @section('content')
-{!!Form::open(['route'=>'payments.showReceiptConsole','method'=>'POST', 'class'=>'form-horizontal form-label-left', 'id'=>'form'])!!}    
+{!!Form::open(['route'=>'payments.saveDocumentPayment','method'=>'POST', 'class'=>'form-horizontal form-label-left', 'id'=>'form'])!!}    
 
 	<div class="form-group">
 		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Número de Documento :
 		</label>
 		<div class="col-md-6 col-sm-6 col-xs-12">
-			<input autofocus type="text" minlength="5" id="name" name="name" readonly="" class="form-control col-md-7 col-xs-12" value={!!$payment_document_number!!}>
+			<input type="text" minlength="5" id="document_number" name="document_number" readonly="" class="form-control col-md-7 col-xs-12" value={!!$payment_document_number!!}>
 		</div>
 	</div>
+
+	<div class="form-group">
+		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Fecha de Pago :
+		</label>
+		<div class="col-md-6 col-sm-6 col-xs-12">
+			<input type="text" minlength="5" id="document_date" name="document_date" readonly="" class="form-control col-md-7 col-xs-12" value={!!$creation_date!!}>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">Monto Total del Documento :
+		</label>
+		<div class="col-md-6 col-sm-6 col-xs-12">
+			<input type="text" minlength="5" id="document_amount" name="document_amount" readonly="" class="form-control col-md-7 col-xs-12" value="S/. 0">
+		</div>
+	</div>
+
+	<input type="hidden" type="text" minlength="5" id="concepts" name="concepts" readonly="" class="form-control col-md-7 col-xs-12" value="">
+
+
 
 	<div class="ln_solid"></div>
 
@@ -94,28 +114,76 @@
 @section('scripts')
 <script >
 $(document).ready(function() { 
+
+	var aData = {};
 	
 	$(".amountToPay").bind('keypress', function(e) {		
-	    if(e.which == 13) {
+
+	    if(e.which == 13 || e.keyCode == 9) {
+	    	
 	    	event.preventDefault();
 
 	    	var sId_md5 = e["currentTarget"]["attributes"][3]["nodeValue"].replace('concept_','');
-	    	var dAmount = $("#concept_"+sId_md5).val();
+	    	sId_md5 = sId_md5.replace('discount_','');
+	    	sId_md5 = sId_md5.replace('interest_','');
 
-	    	console.log(sId_md5);
-	    	console.log(dAmount);
+	    	var sAmount = $("#concept_"+sId_md5).val();
+	    	var sAmountInt = $("#interest_"+sId_md5).val();
+	    	var sAmountDesc = $("#discount_"+sId_md5).val();
+	    	
+	    	var dAmount = 0;
+	    	var dAmountInt = 0;
+	    	var dAmountDesc = 0;
 
-	    	var index = $('.inputs').index(this) + 1;
-         	$('.inputs').eq(index).focus();
+	    	var dTotalRow = 0;
 
+	    	if(sAmount!=""){
+				dAmount = parseFloat(sAmount);
+	    	}
+	    	if(sAmountInt!=""){
+				dAmountInt = parseFloat(sAmountInt);
+	    	}
+	    	if(sAmountDesc!=""){
+				dAmountDesc = parseFloat(sAmountDesc);
+	    	}
+
+
+	    	dTotalRow = dAmount + dAmountInt - dAmountDesc;
+
+	    	$("#total_"+sId_md5).html('S/. '+dTotalRow)
+
+	    	//SAVING DATA ON ARRAY
+	    	if(dAmount>0){
+	    		aData[sId_md5] = {};
+	    		aData[sId_md5]['id_md5'] = sId_md5;
+	    		aData[sId_md5]['concept'] = dAmount;
+	    		aData[sId_md5]['interest'] = dAmountInt;
+	    		aData[sId_md5]['discount'] = dAmountDesc;
+
+	    		var dTotalDocument = 0;
+	    		$.each(aData, function(key, value) {
+			  		var dAmount = aData[key]['concept'];
+			    	var dAmountInt = aData[key]['interest'];
+			    	var dAmountDesc = aData[key]['discount'];
+			    	dTotalDocument = dAmount + dAmountInt - dAmountDesc;	    
+				});
+	    		$("#document_amount").val('S/. '+dTotalDocument);
+	    	}
+
+	    	//NEXT INPUT FOCUS
+	    	var inputs = $(this).closest('form').find(':input');
+  			inputs.eq( inputs.index(this)+ 1 ).focus();
+
+
+  			console.log(aData);
 	    }
 	})
-	
 
-	document.getElementById("form").addEventListener("submit", prepareRequest);
-	function prepareRequest(){		
-		document.getElementById('request').innerHTML = '<input name="amountToPay" type="hidden" value ='+document.getElementById('amountToPay').value+'>';
-	}
+
+	$( "#form" ).submit(function( event ) {
+		$("#concepts").val(JSON.stringify(aData));  		  	
+	});
+
 
 });
 </script>
