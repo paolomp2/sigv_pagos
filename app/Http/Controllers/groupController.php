@@ -56,7 +56,7 @@ class groupController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
+    {        
         $gc = new generalContainer;
         $gc->create = true;
         $gc->select = true;
@@ -77,9 +77,12 @@ class groupController extends Controller
      */
     public function store(Request $request)
     {
+        $config = Configuration::where("current",1)->get();
+
         $group = new Group;
         $group->name = $request->name;
-        $group->description = $request->description;      
+        $group->description = $request->description;    
+        $group->year = $config->year;
         $group->save();
 
         return Redirect::to('/groups');
@@ -252,23 +255,19 @@ class groupController extends Controller
         $gc->page_description = "Seleccione los alumnos que necesite agregar al grupo";
         $gc->breadcrumb('groups.add_list.'.$group->id_md5.'.add_store.'.$group->id_md5);
 
-        /*$gc->students = DB::table('Students')
-                        ->where('comparison_verified',1)->where('creating_flag',0)
-                        ->leftJoin('studentxgroupxyear','Students.id','=','studentxgroupxyear.id_student')
-                        ->where('studentxgroupxyear.id_group',$group->id)
-                        ->toSql();
-        echo dd($gc->students);*/
+        $config = Configuration::where("current",1)->first();
+
+        $sQuery = "select * from students
+                    where deleted_at is null 
+                        and creating_flag = 0 
+                        and enrolled_flag = 1
+                        and year = $config->year
+                        and (select count(*) 
+                                from studentxgroupxyear 
+                                where studentxgroupxyear.id_student = students.id
+                                    and studentxgroupxyear.id_group = $group->id  and studentxgroupxyear.deleted_at is null ) < 1";
         
-        $gc->students = DB::select('select * from `students` 
-                            where `students`.`deleted_at` is null 
-                                and `comparison_verified` = 1 
-                                and `creating_flag` = 0 
-                                and `enrolled_flag` = 1 
-                                and (select count(*) 
-                                        from `studentxgroupxyear` 
-                                        where `studentxgroupxyear`.`id_student` = `students`.`id`
-                                            and `studentxgroupxyear`.`id_group` = '.$group->id.' ) < 1');
-        //echo dd($gc->students);
+        $gc->students = DB::select($sQuery);
         return view('cms.groups.add_element', compact('gc'));
     }
 

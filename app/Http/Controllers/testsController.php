@@ -131,6 +131,10 @@ class testsController extends Controller
 
     public function white($value='')
     {
-        return view('white'); 
+        $password = bcrypt('Baddesita');
+
+        dd($password);
+
+        return view('white','$data'); 
     }
 }

@@ -260,10 +260,10 @@ public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpi
                 d.id_concept_group = c.id_concept_group and
                 d.id = dxg.id_discount and
                 dxg.id_group in(
-                select id_group
-                from studentxgroupxyear
-                where id_student = $iId_student
-                ) and
+                    select id_group
+                    from studentxgroupxyear
+                    where id_student = $iId_student
+                    ) and
                 cxg.id_concept = c.id and
                 dxg.id_group = cxg.id_group and
                 d.deleted_at is null and

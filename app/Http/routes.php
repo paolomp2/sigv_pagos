@@ -145,12 +145,11 @@ Route::group(['middleware' => 'auth'], function (){
 	Route::get('/reports/consolidatedDebtReportGet', ['uses' =>'reportController@consolidatedDebtReportGet']);
 	Route::post('/groups/consolidatedDebtReport', ['as'=>'reports.consolidatedDebtReport', 'uses' => 'reportController@consolidatedDebtReport']);
 	Route::get('/reports/paymentsByDatesReportGet', ['uses' =>'reportController@paymentsByDatesReportGet']);
-	Route::post('/groups/paymentsByDatesReport', ['as'=>'reports.paymentsByDatesReport', 'uses' => 'reportController@paymentsByDatesReport']);
-	
+	Route::post('/groups/paymentsByDatesReport', ['as'=>'reports.paymentsByDatesReport', 'uses' => 'reportController@paymentsByDatesReport']);	
 
 	//TESTS
 	Route::get('/Tests/CreatePaymentDocument/BasicDates_01', ['uses' =>'generatorController@BasicDates_01']);
-	Route::post('/Test/createPaymentDocument/GeneratePayments_02', ['as'=>'Test.createPaymentDocument.GeneratePayments_02', 'uses' => 'generatorController@CreateDocs_02']);
+	Route::post('/Test/createPaymentDocument/GeneratePayments_02', ['as'=>'Test.createPaymentDocument.GeneratePayments_02', 'uses' => 'generatorController@CreateDocs_02']);	
 });
 
 /*Event::listen('illuminate.query',function($query){

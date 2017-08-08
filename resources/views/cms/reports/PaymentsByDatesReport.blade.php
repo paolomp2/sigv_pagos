@@ -61,9 +61,9 @@
     ?>    
     @foreach($gc->payment_documents as $row)
       <tr>
-        <td>{!!$row->created_at!!}</td>
+        <td>{!!$row->date_sell!!}</td>
         <td>{!!$row->correlative_number!!}</td>
-        <td>{!!$row->Student()->last_name." ".$row->Student()->maiden_name.", ".$row->Student()->first_name!!}</td>
+        <td>{!!$row->Student()->full_name!!}</td>
         <td>{!!$row->total_amount!!}</td>
         @if($row->status == config('CONSTANTS.CREATED'))
         <td>Creado</td>
@@ -71,7 +71,7 @@
         @if($row->status == config('CONSTANTS.PAID_OUT'))
         <td>Pagado</td>
         @endif
-        @if($row->status == config('CONSTANTS.CREATED'))
+        @if($row->status == config('CONSTANTS.ANULLATED'))
         <td>Anulado</td>
         @endif
         
