@@ -13,7 +13,7 @@ use sigc\Concept;
 use sigc\Group;
 use sigc\conceptxstudent;
 use sigc\conceptXgroup;
-use sigc\studentxgroupxyear;
+use sigc\studentXgroupXyear;
 use sigc\conceptxinterest;
 
 use sigc\Interest;
@@ -252,7 +252,7 @@ class scheduleController extends Controller
         $concept = Concept::find($id_concept);
         $group = Group::find($group_id);
 
-        $students_group = studentxgroupxyear::where("id_group",$group->id)
+        $students_group = studentXgroupXyear::where("id_group",$group->id)
                                             ->select(array('id_student'))
                                             ->get();
 
