@@ -185,6 +185,8 @@ class classroomController extends Controller
         if($request->name=="")
             $classroom->name = $name_by_infraestructure;
 
+        $config = Configuration::where('current',1)->first();
+        $classroom->year = $config->year;
         $classroom->save();
 
         return Redirect::to('/classrooms');
