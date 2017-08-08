@@ -77,7 +77,7 @@ class groupController extends Controller
      */
     public function store(Request $request)
     {
-        $config = Configuration::where("current",1)->get();
+        $config = Configuration::where("current",1)->first();
 
         $group = new Group;
         $group->name = $request->name;
