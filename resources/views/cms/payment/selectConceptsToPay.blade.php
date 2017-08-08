@@ -2,7 +2,7 @@
 	if(is_null($gc)){
 		dd("Error - General Container not found");
 	}
-    $gc->page_name = "Lista de deudas del alumno: ".$gc->entity_to_edit->first_name.", ".$gc->entity_to_edit->last_name;
+    $gc->page_name = "Lista de deudas del alumno: ".$gc->entity_to_edit->full_name;
     $gc->default_buttons = false;
     $gc->add_buttons = false;
     $gc->select = true;

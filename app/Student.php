@@ -19,7 +19,7 @@ class Student extends Model
 
     public function Groups()
     {
-        return $this->belongsToMany('sigc\Group','studentxgroupxyear','id_student','id_group')->withPivot('year');
+        return $this->belongsToMany('sigc\Group','studentXgroupXyear','id_student','id_group')->withPivot('year');
     }
 
     public function Family_member()
@@ -29,7 +29,7 @@ class Student extends Model
 
     public function studentxgroupxyear()
     {
-        return $this->hasMany('sigc\studentxgroupxyear', 'id_student');
+        return $this->hasMany('sigc\studentXgroupXyear', 'id_student');
     }
 
     

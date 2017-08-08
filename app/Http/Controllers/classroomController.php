@@ -293,7 +293,9 @@ class classroomController extends Controller
 
     public function list_student($id)
     {
+        
         $classroom=Group::find(Hashids::decode($id)[0]-1000);
+        
         $config = Configuration::where('current',1)->first();
 
         $students = Student::whereHas('studentxgroupxyear',function($q) use($classroom,$config){

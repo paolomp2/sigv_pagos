@@ -22,8 +22,7 @@
 		      <select onchange="ChangeID()"  id="student" name="student" class="select2_single form-control">
 		        @foreach($gc->students as $student)
 		        	<option value="{!!$student->id_md5!!}">
-		        		{!!$student->last_name!!}{!!" "!!}{!!$student->maiden_name!!}{!!","!!}
-		        		{!!$student->first_name!!}{!!" "!!}{!!$student->middle_name!!}
+		        		{!!$student->full_name!!}
 					</option>
 		        @endforeach
 		      </select>
