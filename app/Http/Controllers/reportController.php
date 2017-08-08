@@ -37,10 +37,9 @@ class reportController extends Controller
         					->orderBy("year","desc")
         					->orderBy("identifier","asc")
     						->get();
-		$gc = new generalContainer;
-		$gc->classrooms = $cClassrooms;
-
-		return view('cms.reports.consolidatedDebtReport', compact('gc'));
+        $concepts = null;
+        $ClassRoom_name = "";
+		return view('cms.reports.consolidatedDebtReport', compact('cClassrooms','concepts','ClassRoom_name'));
     }
 
     public function consolidatedDebtReport(Request $request)
@@ -50,8 +49,6 @@ class reportController extends Controller
         					->orderBy("year","desc")
         					->orderBy("identifier","asc")
     						->get();
-		$gc = new generalContainer;
-		$gc->classrooms = $cClassrooms;
 
 		//get all Concepts
         $sQuery = "select 
@@ -70,9 +67,7 @@ class reportController extends Controller
 					c.id_concept_group asc,
 					c.fecha_vencimiento asc";
 
-        $collection = DB::select(DB::raw($sQuery));
-
-        $gc->concepts = $collection;
+        $concepts = DB::select(DB::raw($sQuery));
 
 		//get all students x concept
 		$sQuery = "select 
@@ -92,11 +87,12 @@ class reportController extends Controller
 					c.id_concept_group asc,
 					c.fecha_vencimiento asc";
 
-        $collection = DB::select(DB::raw($sQuery));
+        $consolidatedDebtReportGrid = DB::select(DB::raw($sQuery));
 
-        $gc->consolidatedDebtReportGrid = $collection;
+        $ClassRoom_name = ": ".Group::find($request->classroom_id)->name;
+        //dd($consolidatedDebtReportGrid);
 
-        return view('cms.reports.consolidatedDebtReport', compact('gc'));
+        return view('cms.reports.consolidatedDebtReport', compact('cClassrooms','concepts','consolidatedDebtReportGrid','ClassRoom_name'));
     }
 
     public function paymentsByDatesReportGet()

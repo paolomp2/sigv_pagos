@@ -48,7 +48,7 @@
             <ul class="nav child_menu" style="display: none">
               <li><a href="/showListStudents/">Realizar pagos</a></li>
               <li><a href="/createPaymentDocument/">Ingreso manual de boletas</a></li>
-              <li><a href="/updatePayments/showClassrooms/">Actualizar Pagos</a></li>
+              <li><a href="/Payments/void/selectDocument">Anular Boleta</a></li>
             </ul>
           </li>
         </ul>

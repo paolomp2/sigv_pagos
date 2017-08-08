@@ -58,8 +58,8 @@ class paymentController extends Controller
         $gc->entity_to_edit = Student::find($iId_student);
 
         $gc->concepts = $this->getConceptsbyStudentID($iId_student);
-        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student);
-        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student);
+        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student,true);
+        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student,true);
         //dd($cInterestxStudents);
         return view('cms.payment.selectConceptsToPay', compact('gc','cDiscountxStudents','cInterestxStudents'));
 
@@ -72,8 +72,8 @@ class paymentController extends Controller
 
         $gc->entity_to_edit = Student::find($iId_student);
         $gc->concepts = $this->getConceptsbyStudentID($iId_student);
-        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student);
-        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student);
+        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student,true);
+        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student,true);
 
         return view('cms.payment.receiptConsole', compact('gc','cDiscountxStudents', 'cInterestxStudents','iAmountToPay'));        
     }
@@ -87,8 +87,8 @@ class paymentController extends Controller
         $iFlagAlreadyPaid = 0;
         $iPayment_document_total_to_pay = 0;
         $cConcepts = $this->getConceptsbyStudentID($iId_student);
-        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student);
-        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student);
+        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student,true);
+        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student,true);
         
         
         //create Payment Document
@@ -117,9 +117,9 @@ class paymentController extends Controller
             $mpayment_document_line_discount = null;
 
             foreach ($cDiscountxStudents as $oDiscountxStudents) {
-                
+
                 if ($oDiscountxStudents->id_concept==$oConcepts->id && $iLastIdDiscount != $oDiscountxStudents->id_discount) {
-                    
+
                     $iTotalDiscountXConcept+=$oDiscountxStudents->amount;
                     $iLastIdDiscount = $oDiscountxStudents->id_discount;
 
@@ -145,282 +145,341 @@ class paymentController extends Controller
                 //IF THE TOTAL AMOUNT TO PAY IS MORE THAN THE DIFF BETWEEN THE CONCEPT AMOUNT AND THE SUM OF DISCOUNT
                 //THEN I CAN APPLY THE DISCOUNT
                 foreach ($cPayment_document_line_to_pay as $mpayment_document_line_discount) {
-                   $mpayment_document_line_discount->save();
-                }
-                
-            }else{
-                $iAmountToPay-=$iTotalDiscountXConcept;
-                $iTotalDiscountXConcept = 0;
-                $iAmountToPayXConcept = $iAmountToPay;
-                $iAmountToPay = 0;
-                
-            }
-            $iPayment_document_total_to_pay+=$iAmountToPayXConcept-$iTotalDiscountXConcept;
-            
-            $mpayment_document_line_document->amount = $iAmountToPayXConcept;
-            $mpayment_document_line_document->save();
+                 $mpayment_document_line_discount->save();
+             }
+
+         }else{
+            $iAmountToPay-=$iTotalDiscountXConcept;
+            $iTotalDiscountXConcept = 0;
+            $iAmountToPayXConcept = $iAmountToPay;
+            $iAmountToPay = 0;
+
+        }
+        $iPayment_document_total_to_pay+=$iAmountToPayXConcept-$iTotalDiscountXConcept;
+
+        $mpayment_document_line_document->amount = $iAmountToPayXConcept;
+        $mpayment_document_line_document->save();
             //Update conceptXstudent
 
-            $mConceptXstudent = conceptxstudent::where('id_concept',$oConcepts->id)
-                                ->where('id_student',$iId_student)
-                                ->where('already_paid',0)
-                                ->first();
+        $mConceptXstudent = conceptxstudent::where('id_concept',$oConcepts->id)
+        ->where('id_student',$iId_student)
+        ->where('already_paid',0)
+        ->first();
 
-            $mConceptXstudent->total_paid = $iAmountToPayXConcept;
-            $mConceptXstudent->total_discount = $iTotalDiscountXConcept;
-            
-            foreach ($cInterestxStudents as $oInterestxStudents) {
+        $mConceptXstudent->total_paid = $iAmountToPayXConcept;
+        $mConceptXstudent->total_discount = $iTotalDiscountXConcept;
 
-                if ($oInterestxStudents->id_concept == $oConcepts->id ) {
+        foreach ($cInterestxStudents as $oInterestxStudents) {
 
-                    if ($iAmountToPay==0) {
-                        $iFlagAlreadyPaid = 0;
-                        break;
-                    }
+            if ($oInterestxStudents->id_concept == $oConcepts->id ) {
 
-                    $mpayment_document_line_discount = new payment_document_line();
-                    $mpayment_document_line_discount->type_entity = 'INTEREST';
-                    $mpayment_document_line_discount->id_entity = $oInterestxStudents->id_interest;
-                    
-                    if($iAmountToPay>$oInterestxStudents->amount){
-                        $mpayment_document_line_discount->amount = $oInterestxStudents->amount;
-                        $iAmountToPay-=$oInterestxStudents->amount;
-                    }else{
-                        $mpayment_document_line_discount->amount = $iAmountToPay;
-                        $iAmountToPay = 0;
-                    }
-                    $iPayment_document_total_to_pay+=$mpayment_document_line_discount->amount;
-
-                    $mpayment_document_line_discount->id_document_payment = $mpayment_document->id;
-                    $mpayment_document_line_discount->save();
+                if ($iAmountToPay==0) {
+                    $iFlagAlreadyPaid = 0;
+                    break;
                 }
-            }
 
-            $mConceptXstudent->already_paid = $iFlagAlreadyPaid;
-            $mConceptXstudent->save();
+                $mpayment_document_line_discount = new payment_document_line();
+                $mpayment_document_line_discount->type_entity = 'INTEREST';
+                $mpayment_document_line_discount->id_entity = $oInterestxStudents->id_interest;
 
-            if ($iAmountToPay==0) {
-                break;
+                if($iAmountToPay>$oInterestxStudents->amount){
+                    $mpayment_document_line_discount->amount = $oInterestxStudents->amount;
+                    $iAmountToPay-=$oInterestxStudents->amount;
+                }else{
+                    $mpayment_document_line_discount->amount = $iAmountToPay;
+                    $iAmountToPay = 0;
+                }
+                $iPayment_document_total_to_pay+=$mpayment_document_line_discount->amount;
+
+                $mpayment_document_line_discount->id_document_payment = $mpayment_document->id;
+                $mpayment_document_line_discount->save();
             }
         }
+
+        $mConceptXstudent->already_paid = $iFlagAlreadyPaid;
+        $mConceptXstudent->save();
+
+        if ($iAmountToPay==0) {
+            break;
+        }
+    }
         //dd($cPayment_document_line_to_pay);
         //UPDATTING THE TOTAL AMOUNT
-        $mpayment_document->status = config('CONSTANTS.PAID_OUT');
-        $mpayment_document->total_amount = $iPayment_document_total_to_pay;
-        $mpayment_document->save();
+    $mpayment_document->status = config('CONSTANTS.PAID_OUT');
+    $mpayment_document->total_amount = $iPayment_document_total_to_pay;
+    $mpayment_document->save();
         //UPDATING THE CORRELATIVE NUMBER
-        $mPayment_document_group->current_correlative_number++;
-        $mPayment_document_group->save();
+    $mPayment_document_group->current_correlative_number++;
+    $mPayment_document_group->save();
 
-        return Redirect::to('/printPaymentDocument/'.$mpayment_document->id_md5);
+    return Redirect::to('/printPaymentDocument/'.$mpayment_document->id_md5);
+}
+
+
+
+public function getConceptsByStudentID($iId_student)
+{
+    $sQuery = "select
+    c.*,
+    cxs.total_paid
+    from
+    concepts as c,
+    conceptxstudent cxs
+    where
+    cxs.id_student = $iId_student and
+    c.id = cxs.id_concept and
+    cxs.already_paid = 0 and
+    c.deleted_at is null and
+    cxs.deleted_at is null
+    order By c.fecha_vencimiento ASC";
+    return DB::select(DB::raw($sQuery));
+}
+
+public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate)
+{
+
+    $sConditionExpirationDate = "";
+    if ($bConsiderExpirationDate) {
+        $sConditionExpirationDate = " and
+        DATE_ADD(c.fecha_vencimiento, INTERVAL d.days_after_expiration_date DAY) >= now()
+        ";
     }
 
+    $sQuery = "select 
+                c.id as id_concept,
+                c.name as concept_name,
+                d.id as id_discount,
+                dxg.id_group,
+                d.id_md5, 
+                d.name, 
+                if(d.percentage_flag=0, d.amount, c.amount*d.amount/100) as amount,
+                DATE_ADD(c.fecha_vencimiento, INTERVAL d.days_after_expiration_date DAY) as expiration_date
+            from
+                discounts d, concepts c, discountxgroup dxg, conceptxgroup cxg
+            where
+                d.id_concept_group = c.id_concept_group and
+                d.id = dxg.id_discount and
+                dxg.id_group in(
+                select id_group
+                from studentxgroupxyear
+                where id_student = $iId_student
+                ) and
+                cxg.id_concept = c.id and
+                dxg.id_group = cxg.id_group and
+                d.deleted_at is null and
+                c.deleted_at is null and
+                dxg.deleted_at is null and
+                cxg.deleted_at is null
+                $sConditionExpirationDate
+            order by c.year desc, c.id asc, d.name asc, d.id asc";
 
+    return DB::select(DB::raw($sQuery));
+}
 
-    public function getConceptsByStudentID($iId_student)
-    {
-        $sQuery = "select
-                        c.*,
-                        cxs.total_paid
-                    from
-                        concepts as c,
-                        conceptxstudent cxs
-                    where
-                        cxs.id_student = $iId_student and
-                        c.id = cxs.id_concept and
-                        cxs.already_paid = 0 and
-                        c.deleted_at is null and
-                        cxs.deleted_at is null
-                    order By c.fecha_vencimiento ASC";
-        return DB::select(DB::raw($sQuery));
-    }
+public function getInterestsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate)
+{
+    $sQuery = "select i.id as id_interest, i.id_md5, c.id as id_concept, c.id_md5, c.name as concept_name, i.name, datediff(Now(),c.fecha_vencimiento) as days_diff,
+    if(i.percentage_flag, datediff(Now(),c.fecha_vencimiento) * c.amount * i.amount / 100 , datediff(Now(),c.fecha_vencimiento) * i.amount) as amount
+        from interests i, interestxgroup ixg, concept_groupsxinterest cgxi, concepts c
+    where 
+    i.id = ixg.id_interest and
+    ixg.id_group in (
+    select sxgxy.id_group
+    from studentxgroupxyear sxgxy
+    where sxgxy.id_student = $iId_student
+    ) and
+    c.id_concept_group = cgxi.id_concept_groups and
+    cgxi.id_interest = i.id and
+    i.deleted_at is null and
+    c.deleted_at is null and
+    ixg.deleted_at is null and
+    cgxi.deleted_at is null";
 
-    public function getDiscountsByStudentOrderByConcept($iId_student)
-    {
-        $sQuery = "select 
-                      c.id as id_concept,
-                      c.name as concept_name,
-                       d.id as id_discount,
-                       dxg.id_group,
-                       d.id_md5, 
-                       d.name, 
-                       if(d.percentage_flag=0, d.amount, c.amount*d.amount/100) as amount,
-                       DATE_ADD(c.fecha_vencimiento, INTERVAL d.days_after_expiration_date DAY) as expiration_date
-                 from
-                     discounts d, concepts c, discountxgroup dxg, conceptxgroup cxg
-                 where
-                     d.id_concept_group = c.id_concept_group and
-                     d.id = dxg.id_discount and
-                     dxg.id_group in(
-                         select id_group
-                         from studentxgroupxyear
-                         where id_student = $iId_student
-                     ) and
-                     cxg.id_concept = c.id and
-                     dxg.id_group = cxg.id_group and
-                     d.deleted_at is null and
-                     c.deleted_at is null and
-                     dxg.deleted_at is null and
-                     cxg.deleted_at is null and
-                    DATE_ADD(c.fecha_vencimiento, INTERVAL d.days_after_expiration_date DAY) >= now()
-                 order by c.year desc, c.id asc, d.name asc, d.id asc";
+    return DB::select(DB::raw($sQuery));
+}
 
-                 return DB::select(DB::raw($sQuery));
-    }
+public function printPaymentDocument($id_payment_document_md5){
 
-    public function getInterestsByStudentOrderByConcept($iId_student)
-    {
-        $sQuery = "select i.id as id_interest, i.id_md5, c.id as id_concept, c.id_md5, c.name as concept_name, i.name, datediff(Now(),c.fecha_vencimiento) as days_diff,
-                        if(i.percentage_flag, datediff(Now(),c.fecha_vencimiento) * c.amount * i.amount / 100 , datediff(Now(),c.fecha_vencimiento) * i.amount) as amount
-                    from interests i, interestxgroup ixg, concept_groupsxinterest cgxi, concepts c
-                    where 
-                        i.id = ixg.id_interest and
-                        ixg.id_group in (
-                            select sxgxy.id_group
-                            from studentxgroupxyear sxgxy
-                            where sxgxy.id_student = $iId_student
-                        ) and
-                        c.id_concept_group = cgxi.id_concept_groups and
-                        cgxi.id_interest = i.id and
-                        i.deleted_at is null and
-                        c.deleted_at is null and
-                        ixg.deleted_at is null and
-                        cgxi.deleted_at is null";
+    $id_payment_document = Hashids::decode($id_payment_document_md5)[0]-1000;
+    $cPayment_document= payment_document::where("id",$id_payment_document)->get();       
 
-                 return DB::select(DB::raw($sQuery));
-    }
-
-    public function printPaymentDocument($id_payment_document_md5){
-        
-        $id_payment_document = Hashids::decode($id_payment_document_md5)[0]-1000;
-        $cPayment_document= payment_document::where("id",$id_payment_document)->get();       
-        
         //Print PDF
-        $view =  \View::make('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document'))->render();
-        $pdf = \App::make('dompdf.wrapper');
-        $pdf->loadHTML($view);
-        return $pdf->download('payment_'.$id_payment_document_md5.'.pdf');
-    }
+    $view =  \View::make('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document'))->render();
+    $pdf = \App::make('dompdf.wrapper');
+    $pdf->loadHTML($view);
+    return $pdf->download('payment_'.$id_payment_document_md5.'.pdf');
+}
 
     //Not Used
-    public function printPaymentDocument_test($id_payment_document_md5)
-    {
-        $id_payment_document = Hashids::decode($id_payment_document_md5)[0]-1000;
-        $cPayment_document= payment_document::where("id",$id_payment_document)->get();       
-        
+public function printPaymentDocument_test($id_payment_document_md5)
+{
+    $id_payment_document = Hashids::decode($id_payment_document_md5)[0]-1000;
+    $cPayment_document= payment_document::where("id",$id_payment_document)->get();       
+
         //Print PDF
-        $view =  \View::make('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document'))->render();
-        $pdf = \App::make('dompdf.wrapper');
-        $pdf->loadHTML($view);
-        return $pdf->download('payment_'.$date_ini->toFormattedDateString().'-'.$date_end->toFormattedDateString().'.pdf');
-    }
+    $view =  \View::make('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document'))->render();
+    $pdf = \App::make('dompdf.wrapper');
+    $pdf->loadHTML($view);
+    return $pdf->download('payment_'.$date_ini->toFormattedDateString().'-'.$date_end->toFormattedDateString().'.pdf');
+}
 
     //CREATE DOCUMENT
-    public function createPaymentDocument()
-    {
-        $config = Configuration::where("current",1)->first();
+public function createPaymentDocument()
+{
+    $config = Configuration::where("current",1)->first();
+    $cStudents = Student::where("year",$config->year)->orderBy("identifier","Asc")->get();
 
-        $cStudents = Student::where("year",$config->year)->orderBy("identifier","Asc")->get();
-        return view('cms.payment.createPaymentDocument.createPaymentDocument', compact('cStudents'));  
-    }
+    return view('cms.payment.createPaymentDocument.createPaymentDocument', compact('cStudents'));  
+}
 
-    public function getDebsListWithOutDateLimit(Request $request)
-    {
-        $payment_document_number = $request->payment_document_number;
-        $id_md5 = $request->student;
-        $creation_date = $request->creation_date;
+public function getDebsListWithOutDateLimit(Request $request)
+{
+    $payment_document_number = $request->payment_document_number;
+    $id_md5 = $request->student;
+    $creation_date = $request->creation_date;
 
-        $id_student = Hashids::decode($id_md5)[0]-1000;
-        $oStudent = Student::find($id_student);
-        $cConcepts = $this->getConceptsbyStudentID($id_student);
-        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($id_student);
-        $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($id_student);
+    $id_student = Hashids::decode($id_md5)[0]-1000;
+    $oStudent = Student::find($id_student);
+    $cConcepts = $this->getConceptsbyStudentID($id_student);
+    $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($id_student, false);
+    $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($id_student, false);
+    
+    return view('cms.payment.createPaymentDocument.selectConceptsToPay', compact('cConcepts','cDiscountxStudents','cInterestxStudents','oStudent','payment_document_number','creation_date'));  
+}
 
-        return view('cms.payment.createPaymentDocument.selectConceptsToPay', compact('cConcepts','cDiscountxStudents','cInterestxStudents','oStudent','payment_document_number','creation_date'));  
-    }
+public function saveDocumentPayment(Request $request)
+{
 
-    public function saveDocumentPayment(Request $request)
-    {
-        $document_number = $request->document_number;
-        $document_date = $request->document_date;
-        $document_amount = $request->document_amount;
-        $id_student = $request->id_student;        
-        $concepts = json_decode($request->concepts);
+    $document_number = $request->document_number;
+    $document_date = $request->document_date;
+    $document_amount = str_replace("S/. ", "", $request->document_amount);
+    $id_student = $request->id_student;        
+    $concepts = json_decode($request->concepts);
+
+    //Updating Correlative Number
+    $mPayment_document_group = payment_document_group::find(2);
+    $mPayment_document_group->current_correlative_number = $document_number;
+    $mPayment_document_group->save();
+
+    //create Payment Document
+    $mpayment_document = new payment_document();
+    $mpayment_document->id_student = $id_student;
+    $mpayment_document->status = config('CONSTANTS.CREATED');
+    $mpayment_document->id_document = $mPayment_document_group->id;
+    $mpayment_document->correlative_number = $mPayment_document_group->current_correlative_number;
+    $mpayment_document->date_sell = $document_date;
+    $mpayment_document->total_amount = $document_amount;
+    $mpayment_document->save();
+    $mpayment_document->id_md5 = Hashids::encode($mpayment_document->id+1000);
+    $mpayment_document->save();
+
+    foreach ($concepts as $id_md5_concept => $oRow) {
+
+        $id_interest = 0;
+        $id_discount = 0;
+        //UPDATING IDs
+        if ($oRow->interest_id <> "InterestNull") {
+            $id_interest = Hashids::decode($oRow->interest_id)[0]-1000;
+        }
+        if ($oRow->discount_id <> "DiscountNull") {
+            $id_discount = Hashids::decode($oRow->discount_id)[0]-1000;
+        }
+
+        //CONCEPT
+        $oDocumentPaymentLine = new Payment_document_line();
+        $oDocumentPaymentLine->type_entity = "CONCEPT";
+        $oDocumentPaymentLine->id_entity = Hashids::decode($oRow->id_md5)[0]-1000;
+        $oDocumentPaymentLine->id_document_payment = $mpayment_document->id;
+        $oDocumentPaymentLine->amount = $oRow->concept;
+        $oDocumentPaymentLine->save();
+        //INTEREST
+        if ($oRow->interest>0) {
+            $oDocumentPaymentLineInterest = new Payment_document_line();
+            $oDocumentPaymentLineInterest->type_entity = "INTEREST";
+            $oDocumentPaymentLineInterest->id_entity = $id_interest;
+            $oDocumentPaymentLineInterest->id_document_payment = $mpayment_document->id;
+            $oDocumentPaymentLineInterest->amount = $oRow->interest;
+            $oDocumentPaymentLineInterest->save();
+        }        
+        //DISCOUNT
+        if ($oRow->discount>0) {
+            $oDocumentPaymentLineDiscount = new Payment_document_line();
+            $oDocumentPaymentLineDiscount->type_entity = "DISCOUNT";
+            $oDocumentPaymentLineDiscount->id_entity = $id_discount;
+            $oDocumentPaymentLineDiscount->id_document_payment = $mpayment_document->id;
+            $oDocumentPaymentLineDiscount->amount = $oRow->discount;
+            $oDocumentPaymentLineDiscount->save();
+        }
         
+
+        //UPDATE DEBTS
+        $oConceptXstudent = conceptxstudent::where("id_student",$id_student)->where("id_concept",Hashids::decode($oRow->id_md5)[0]-1000)->first();
+        $oConceptXstudent->total_discount += $oRow->discount;
+        $oConceptXstudent->total_interest += $oRow->interest;
+        $oConceptXstudent->total_paid += $oDocumentPaymentLine->amount;
+
+        if(($oConceptXstudent->total_paid + $oConceptXstudent->total_discount) >= $oConceptXstudent->original_amount){
+            $oConceptXstudent->already_paid = 1;
+        }
+
+        $oConceptXstudent->save();
     }
+    return view('cms.payment.createPaymentDocument.confirmation');  
+}
 
 
     //UPDATE PAYMENT
-    public function showClassrooms()
+    public function Payments_void_selectDocument()
     {
-        $config = Configuration::where("current",1)->first();
-        //get all classrooms
-        $cClassrooms = Group::where("classroom_flag",1)
-                            ->where("year",$config->year)
-                            ->orderBy("year","desc")
-                            ->orderBy("identifier","asc")
-                            ->get();
-        $gc = new generalContainer;
-        $gc->classrooms = $cClassrooms;
-
-        return view('cms.payment.updatePayments.updatePayment', compact('gc'));
+        return view('cms.payment.voidPaymentDocument.selectDocument');  
     }
 
-    public function ShowStudentsDebts(Request $request)
+    public function Payments_void_deleteDocument(Request $request)
     {
-        //get all classrooms
-        $cClassrooms = Group::where("classroom_flag",1)
-                            ->orderBy("year","desc")
-                            ->orderBy("identifier","asc")
-                            ->get();
-        $gc = new generalContainer;
-        $gc->classrooms = $cClassrooms;
+        $document_number = payment_document::where("correlative_number",$request->document_number)->first();
 
-        //get all Concepts
-        $sQuery = "select 
-                    c.id, c.name
-                from
-                    students s, conceptxstudent cxs, concepts c, groups g, studentxgroupxyear sxgxy
-                where
-                    s.id = cxs.id_student and
-                    c.id = cxs.id_concept and
-                    g.id = $request->classroom_id and
-                    sxgxy.id_group = g.id and
-                    sxgxy.id_student = s.id
-                Group by
-                    c.id
-                Order by
-                    c.id_concept_group asc,
-                    c.fecha_vencimiento asc";
+        $sConfirmationMsg = "Documento de pago no encontrado";
 
-        $collection = DB::select(DB::raw($sQuery));
+        if(count($document_number)>0){
+            
+            $cDocumentLine = Payment_document_line::where("id_document_payment",$document_number->id)->get();
+            
+            $ilastIdConcept = -1;
+            foreach ($cDocumentLine as $oDocumentLine) {
+                if ($oDocumentLine->type_entity == "CONCEPT") {                    
+                    //GET DEBT OF STUDENT
+                    $ilastIdConcept = $oDocumentLine->type_entity;
+                    $oConceptXstudent = conceptxstudent::where("id_student",$document_number->id_student)->where("id_concept",$oDocumentLine->id_entity)->first();
+                    $oConceptXstudent->total_paid -= $oDocumentLine->amount;
+                    $oConceptXstudent->already_paid = 0;
+                    $oConceptXstudent->save();
+                }
 
-        $gc->concepts = $collection;
+                if ($oDocumentLine->type_entity == "INTEREST") {
+                    //GET DEBT OF STUDENT
+                    $oConceptXstudent = conceptxstudent::where("id_student",$document_number->id_student)->where("id_concept",$ilastIdConcept)->first();
+                    $oConceptXstudent->total_interest -= $oDocumentLine->amount;
+                    $oConceptXstudent->already_paid = 0;
+                    $oConceptXstudent->save();
+                }
 
-        //get all students x concept
-        $sQuery = "select 
-                    CONCAT(s.last_name,' ',s.maiden_name,', ',s.first_name) as fullname, 
-                    c.id,
-                    IF(cxs.already_paid=0,cxs.original_amount-cxs.total_paid,-1) as debt
-                from
-                    students s, conceptxstudent cxs, concepts c, groups g, studentxgroupxyear sxgxy
-                where
-                    s.id = cxs.id_student and
-                    c.id = cxs.id_concept and
-                    g.id = $request->classroom_id and
-                    sxgxy.id_group = g.id and
-                    sxgxy.id_student = s.id
-                Order by
-                    fullname,
-                    c.id_concept_group asc,
-                    c.fecha_vencimiento asc";
+                if ($oDocumentLine->type_entity == "DISCOUNT") {
+                    //GET DEBT OF STUDENT
+                    $oConceptXstudent = conceptxstudent::where("id_student",$document_number->id_student)->where("id_concept",$ilastIdConcept)->first();
+                    $oConceptXstudent->total_discount -= $oDocumentLine->amount;
+                    $oConceptXstudent->already_paid = 0;
+                    $oConceptXstudent->save();
+                }
+            }
 
-        $collection = DB::select(DB::raw($sQuery));
-
-        $gc->consolidatedDebtReportGrid = $collection;
-
-        return view('cms.payment.updatePayments.updatePayment', compact('gc'));
+            $document_number->delete();
+            $sConfirmationMsg = "Documento Eliminado exitosamente";
+            return view('cms.payment.voidPaymentDocument.confirmation', compact('sConfirmationMsg'));
+        }else{
+            return view('cms.payment.voidPaymentDocument.confirmation', compact('sConfirmationMsg'));         
+        }
     }
+
 
     //END UPDATE PAYMENT
 

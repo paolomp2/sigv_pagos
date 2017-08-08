@@ -7,6 +7,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/datatables.min.css"/>
+ 
+  <script type="text/javascript" src="https://cdn.datatables.net/v/dt/datatables.min.js"></script>
+
   <title>SIGC</title>
   <!-- MATERIALIZE -->
 
@@ -49,6 +53,7 @@
   @endif
 
   {!!Html::style('cms/css/icheck/flat/green.css')!!}
+
   
   <!--[if lt IE 9]>
     {!!Html::script('cms/js/ie8-responsive-file-warning.js')!!}

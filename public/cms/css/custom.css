@@ -1,5 +1,12 @@
 /**************CUSTOM****************/
 
+#debts_table td{
+    padding: 5px 9px !important;    
+}
+#debts_table th{
+    padding: 5px 9px !important;    
+}
+
 .button_right {
     float: right;
     min-width: 70px;
@@ -932,8 +939,8 @@ table.no-margin .progress {
     position: relative;
     min-height: 1px;
     float: left;
-    padding-right: 10px;
-    padding-left: 10px;
+    padding-right: 5px;
+    padding-left: 5px;
 }
 
 .row {

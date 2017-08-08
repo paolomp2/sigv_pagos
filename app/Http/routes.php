@@ -71,9 +71,8 @@ Route::group(['middleware' => 'auth'], function (){
 	Route::post('/getDebsListWithOutDateLimit', ['as'=>'payments.getDebsListWithOutDateLimit', 'uses' =>'paymentController@getDebsListWithOutDateLimit']);
 	Route::post('/saveDocumentPayment', ['as'=>'payments.saveDocumentPayment', 'uses' =>'paymentController@saveDocumentPayment']);
 		//update Payments
-	Route::get('/updatePayments/showClassrooms', ['uses' =>'paymentController@showClassrooms']);
-	Route::post('/updatePayments/ShowStudentsDebts', ['as'=>'updatePayments.ShowStudentsDebts', 'uses' => 'paymentController@ShowStudentsDebts']);
-	Route::post('/updatePayments/SaveStudentsDebts', ['as'=>'updatePayments.SaveStudentsDebts', 'uses' => 'paymentController@SaveStudentsDebts']);
+	Route::get('/Payments/void/selectDocument', ['uses' =>'paymentController@Payments_void_selectDocument']);
+	Route::post('/Payments/void/selectDocument', ['as'=>'payments.void.deleteDocument','uses' =>'paymentController@Payments_void_deleteDocument']);
 
 
 	//SCHEDULES
