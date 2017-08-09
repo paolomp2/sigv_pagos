@@ -16,7 +16,7 @@
     @foreach($gc->students as $student)
     <tr>
       <th scope="row">{!!$i!!}</th>
-      <td>{!!$student->first_name!!} {!!$student->middle_name!!}, {!!$student->last_name!!} {!!$student->maiden_name!!}</td>
+      <td>{!!$student->full_name!!}</td>
       <td>{!!$student->classroom->description!!}</td>
 
       <td>

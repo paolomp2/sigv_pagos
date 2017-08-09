@@ -102,15 +102,15 @@ class reportController extends Controller
     }
 
     public function paymentsByDatesReport(Request $request)
-    {
+    {   
     	$gc = new generalContainer;
     	$gc->dateFrom = $request->dateFrom;
     	$gc->dateTo = $request->dateTo;
-
+        $gc->table = true;
     	$gc->payment_documents = Payment_Document::where('date_sell','>=',$request->dateFrom)
-    											->where('date_sell','>=',$request->dateTo)
+    											->where('date_sell','<=',$request->dateTo)
     											->OrderBy('correlative_number')
-    											->get();
+    											->get();             
 
     	return view('cms.reports.paymentsByDatesReport', compact('gc'));
     }

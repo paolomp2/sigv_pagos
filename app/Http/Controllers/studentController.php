@@ -383,12 +383,17 @@ class studentController extends Controller
 
             $i = 1;            
             while ($sheet->getCellByColumnAndRow(0,$i)<> "") {                
-                
+                    
                 $student = new Student;
 
                 $oBulckContainer->num_students++;
                 $oBulckContainer->num_students_aux++;
                 $student->full_name = $sheet->getCellByColumnAndRow(0,$i);
+
+                if($student->full_name="")
+                    continue;
+
+                $student->full_name = str_replace("  "," ",$student->full_name);
 
                 $student_name_array = explode(" ",$student->full_name);
 

@@ -27,7 +27,7 @@ class Student extends Model
         return $this->belongsToMany('sigc\Family_member','studentxfamily_member','id_family_member','id_student')->withTimestamps();
     }
 
-    public function studentxgroupxyear()
+    public function studentXgroupXyear()
     {
         return $this->hasMany('sigc\studentXgroupXyear', 'id_student');
     }

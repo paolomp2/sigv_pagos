@@ -22,7 +22,18 @@
     <div class="col-md-6 col-sm-9 col-xs-12">
       <input type="text" minlength="5" maxlength="150" id="description" name="description" required="required" class="form-control col-md-7 col-xs-12" value={!!'"'.$gc->entity_to_edit->description.'"'!!}>
     </div>
-  </div>                            
+  </div>
+
+  <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="last-name">Fecha de caducidad<span class="required">*</span>
+      </label>
+      <div class="col-md-3 col-sm-6 col-xs-6">
+        <div class="controls">                          
+            <input required="required" type="text" class="form-control has-feedback-left" id="expiration_date" name="expiration_date" placeholder="Fecha de expiración" value={!!'"'.$gc->entity_to_edit->expiration_date.'"'!!}>
+            <span class="fa fa-calendar-o form-control-feedback left" aria-hidden="true"></span>                  
+        </div>
+      </div>
+    </div>                         
   
   <div class="ln_solid"></div>
   <div class="form-group">
@@ -45,4 +56,16 @@
     });
   </script>
 <!-- /select2 -->
+<!-- /datepicker -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#expiration_date').daterangepicker({
+        "singleDatePicker": true,
+        calender_style: "picker_2",
+        format: "YYYY-MM-DD",
+      }, function(start, end, label) {
+        console.log(start.toISOString(), end.toISOString(), label);
+      });
+    });
+  </script>
 @endsection
