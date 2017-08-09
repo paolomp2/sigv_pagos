@@ -73,7 +73,8 @@ Route::group(['middleware' => 'auth'], function (){
 		//update Payments
 	Route::get('/Payments/void/selectDocument', ['uses' =>'paymentController@Payments_void_selectDocument']);
 	Route::post('/Payments/void/selectDocument', ['as'=>'payments.void.deleteDocument','uses' =>'paymentController@Payments_void_deleteDocument']);
-
+		//showDocument
+	Route::get('/Payment/show_document/{id}', ['uses' =>'paymentController@Payments_show_document']);
 
 	//SCHEDULES
 	/*Route::resource('schedules','scheduleController');

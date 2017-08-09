@@ -106,7 +106,7 @@ class reportController extends Controller
     	$gc = new generalContainer;
     	$gc->dateFrom = $request->dateFrom;
     	$gc->dateTo = $request->dateTo;
-
+        $gc->table = true;
     	$gc->payment_documents = Payment_Document::where('date_sell','>=',$request->dateFrom)
     											->where('date_sell','<=',$request->dateTo)
     											->OrderBy('correlative_number')

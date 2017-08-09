@@ -14,7 +14,7 @@ class Interest extends Model
 
     public function Concepts_groups()
     {
-    	return $this->belongsToMany('sigc\Concept_group', 'concept_groupsxinterest', 'id_interest', 'id_concept_groups');
+        return $this->belongsTo('sigc\Concept_group', 'concept_group');
     }
 
     public function Concepts()

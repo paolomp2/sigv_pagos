@@ -8,6 +8,7 @@
       <th>#</th>
       <th>Nombre</th>
       <th>Registrados</th>
+      <th>Fecha de Caducidad</th>
       <th>Opciones</th>
     </tr>
   </thead>
@@ -18,7 +19,7 @@
       <th scope="row">{!!$i!!}</th>
       <td>{!!$group->name!!}</td>
       <td>{!!$group->num_people!!}</td>
-
+      <td>{!!$group->expiration_date!!}</td>
       <td>
         <?php 
           if (is_null($group->deleted_at)) {

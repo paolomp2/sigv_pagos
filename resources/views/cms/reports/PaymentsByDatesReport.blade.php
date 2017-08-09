@@ -53,6 +53,7 @@
       <th>Alumno</th>
       <th>Monto</th>
       <th>Estado</th>
+      <th>Opciones</th>
     </tr> 
   </thead>
   <tbody>
@@ -65,17 +66,32 @@
         <td>{!!$row->correlative_number!!}</td>
         <td>{!!$row->Student()->full_name!!}</td>
         <td>{!!$row->total_amount!!}</td>
+        <?php $bStatus = false;?>
+        
         @if($row->status == config('CONSTANTS.CREATED'))
+        <?php $bStatus = true;?>
         <td>Creado</td>
         @endif
+        
         @if($row->status == config('CONSTANTS.PAID_OUT'))
+        <?php $bStatus = true;?>
         <td>Pagado</td>
         @endif
+        
         @if($row->status == config('CONSTANTS.ANULLATED'))
+        <?php $bStatus = true;?>
         <td>Anulado</td>
         @endif
-        
-      </tr>  
+
+        @if($bStatus == false)        
+        <td>Not definded</td>
+        @endif
+        <td>
+          <a href={!!"/Payment/show_document/".$row->id_md5!!} class="btn btn-primary btn-xs"><i class="fa fa-see"></i> Ver </a> 
+        </td>
+      </tr>
+
+      
     @endforeach
                   
   </tbody>

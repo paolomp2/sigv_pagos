@@ -238,11 +238,19 @@ public function getConceptsByStudentID($iId_student)
 public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate)
 {
 
-    $sConditionExpirationDate = "";
+    $sConditionExpirationDateConcept = "";
+    $sConditionExpirationDateGroup = "";
     if ($bConsiderExpirationDate) {
-        $sConditionExpirationDate = " and
+        $sConditionExpirationDateConcept = " and
         DATE_ADD(c.fecha_vencimiento, INTERVAL d.days_after_expiration_date DAY) >= now()
         ";
+        $sConditionExpirationDateGroup = " and id_group in(
+            select id 
+            from
+                groups where
+                (expiration_date is null or expiration_date >= now())
+                and deleted_at is null
+            ) ";
     }
 
     $sQuery = "select 
@@ -263,6 +271,7 @@ public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpi
                     select id_group
                     from studentxgroupxyear
                     where id_student = $iId_student
+                    $sConditionExpirationDateGroup
                     ) and
                 cxg.id_concept = c.id and
                 dxg.id_group = cxg.id_group and
@@ -270,7 +279,7 @@ public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpi
                 c.deleted_at is null and
                 dxg.deleted_at is null and
                 cxg.deleted_at is null
-                $sConditionExpirationDate
+                $sConditionExpirationDateConcept
             order by c.year desc, c.id asc, d.name asc, d.id asc";
 
     return DB::select(DB::raw($sQuery));
@@ -278,22 +287,45 @@ public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpi
 
 public function getInterestsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate)
 {
-    $sQuery = "select i.id as id_interest, i.id_md5, c.id as id_concept, c.id_md5, c.name as concept_name, i.name, datediff(Now(),c.fecha_vencimiento) as days_diff,
-    if(i.percentage_flag, datediff(Now(),c.fecha_vencimiento) * c.amount * i.amount / 100 , datediff(Now(),c.fecha_vencimiento) * i.amount) as amount
-        from interests i, interestxgroup ixg, concept_groupsxinterest cgxi, concepts c
-    where 
-    i.id = ixg.id_interest and
-    ixg.id_group in (
-    select sxgxy.id_group
-    from studentxgroupxyear sxgxy
-    where sxgxy.id_student = $iId_student
-    ) and
-    c.id_concept_group = cgxi.id_concept_groups and
-    cgxi.id_interest = i.id and
-    i.deleted_at is null and
-    c.deleted_at is null and
-    ixg.deleted_at is null and
-    cgxi.deleted_at is null";
+
+    $sConditionExpirationDateConcept = "";
+    $sConditionExpirationDateGroup = "";
+    if ($bConsiderExpirationDate) {
+        $sConditionExpirationDateConcept = " and
+        c.fecha_vencimiento > now()
+        ";
+        $sConditionExpirationDateGroup = " and id_group in(
+            select id 
+            from
+                groups where
+                (expiration_date is null or expiration_date >= now())
+                and deleted_at is null
+            ) ";
+    }
+
+    $sQuery = "select 
+                i.id as id_interest, 
+                i.id_md5, 
+                c.id as id_concept,
+                c.name as concept_name, 
+                i.name, 
+                datediff(Now(),c.fecha_vencimiento) as days_diff,
+                if(i.percentage_flag, datediff(Now(),c.fecha_vencimiento) * c.amount * i.amount / 100 , datediff(Now(),c.fecha_vencimiento) * i.amount) as amount
+            from interests i, interestxgroup ixg, concepts c
+            where 
+                i.id = ixg.id_interest and
+                i.concept_group = c.id_concept_group and
+                ixg.id_group in (
+                    select sxgxy.id_group
+                    from studentxgroupxyear sxgxy
+                    where sxgxy.id_student = $iId_student
+                    $sConditionExpirationDateGroup
+                ) and
+                i.deleted_at is null and
+                c.deleted_at is null and
+                ixg.deleted_at is null
+                $sConditionExpirationDateConcept
+                ";
 
     return DB::select(DB::raw($sQuery));
 }
@@ -349,10 +381,10 @@ public function getDebsListWithOutDateLimit(Request $request)
 
 public function saveDocumentPayment(Request $request)
 {
-
     $document_number = $request->document_number;
     $document_date = $request->document_date;
     $document_amount = str_replace("S/. ", "", $request->document_amount);
+    //dd($document_amount);
     $id_student = $request->id_student;        
     $concepts = json_decode($request->concepts);
 
@@ -374,49 +406,57 @@ public function saveDocumentPayment(Request $request)
     $mpayment_document->save();
 
     foreach ($concepts as $id_md5_concept => $oRow) {
-
-        $id_interest = 0;
-        $id_discount = 0;
-        //UPDATING IDs
-        if ($oRow->interest_id <> "InterestNull") {
-            $id_interest = Hashids::decode($oRow->interest_id)[0]-1000;
+        
+        if (!$oRow->using) {
+            continue;
         }
-        if ($oRow->discount_id <> "DiscountNull") {
-            $id_discount = Hashids::decode($oRow->discount_id)[0]-1000;
-        }
+        $dConceptAmount = $oRow->amount;
+        $dDiscountAmount = 0;
+        $dInterestAmount = 0;
 
         //CONCEPT
         $oDocumentPaymentLine = new Payment_document_line();
         $oDocumentPaymentLine->type_entity = "CONCEPT";
         $oDocumentPaymentLine->id_entity = Hashids::decode($oRow->id_md5)[0]-1000;
         $oDocumentPaymentLine->id_document_payment = $mpayment_document->id;
-        $oDocumentPaymentLine->amount = $oRow->concept;
+        $oDocumentPaymentLine->amount = $oRow->amount;
         $oDocumentPaymentLine->save();
-        //INTEREST
-        if ($oRow->interest>0) {
-            $oDocumentPaymentLineInterest = new Payment_document_line();
-            $oDocumentPaymentLineInterest->type_entity = "INTEREST";
-            $oDocumentPaymentLineInterest->id_entity = $id_interest;
-            $oDocumentPaymentLineInterest->id_document_payment = $mpayment_document->id;
-            $oDocumentPaymentLineInterest->amount = $oRow->interest;
-            $oDocumentPaymentLineInterest->save();
-        }        
+
         //DISCOUNT
-        if ($oRow->discount>0) {
-            $oDocumentPaymentLineDiscount = new Payment_document_line();
-            $oDocumentPaymentLineDiscount->type_entity = "DISCOUNT";
-            $oDocumentPaymentLineDiscount->id_entity = $id_discount;
-            $oDocumentPaymentLineDiscount->id_document_payment = $mpayment_document->id;
-            $oDocumentPaymentLineDiscount->amount = $oRow->discount;
-            $oDocumentPaymentLineDiscount->save();
+        foreach ($oRow->discount as $oRowDiscount) {
+
+            if ($oRowDiscount->amount>0) {
+                $oDocumentPaymentLineDiscount = new Payment_document_line();
+                $oDocumentPaymentLineDiscount->type_entity = "DISCOUNT";
+                $oDocumentPaymentLineDiscount->id_entity = Hashids::decode($oRowDiscount->id_md5)[0]-1000;
+                $oDocumentPaymentLineDiscount->id_document_payment = $mpayment_document->id;
+                $oDocumentPaymentLineDiscount->amount = $oRowDiscount->amount;
+                $oDocumentPaymentLineDiscount->save();
+
+                $dDiscountAmount += $oRowDiscount->amount;
+            } 
         }
-        
+
+        //INTEREST
+        foreach ($oRow->interest as $oRowInterest) {
+
+            if ($oRowInterest->amount>0) {
+                $oDocumentPaymentLineInterest = new Payment_document_line();
+                $oDocumentPaymentLineInterest->type_entity = "INTEREST";
+                $oDocumentPaymentLineInterest->id_entity = Hashids::decode($oRowInterest->id_md5)[0]-1000;
+                $oDocumentPaymentLineInterest->id_document_payment = $mpayment_document->id;
+                $oDocumentPaymentLineInterest->amount = $oRowInterest->amount;
+                $oDocumentPaymentLineInterest->save();
+
+                $dInterestAmount += $oRowInterest->amount;
+            } 
+        }        
 
         //UPDATE DEBTS
         $oConceptXstudent = conceptxstudent::where("id_student",$id_student)->where("id_concept",Hashids::decode($oRow->id_md5)[0]-1000)->first();
-        $oConceptXstudent->total_discount += $oRow->discount;
-        $oConceptXstudent->total_interest += $oRow->interest;
-        $oConceptXstudent->total_paid += $oDocumentPaymentLine->amount;
+        $oConceptXstudent->total_discount += $dDiscountAmount;
+        $oConceptXstudent->total_interest += $dInterestAmount;
+        $oConceptXstudent->total_paid += $dConceptAmount;
 
         if(($oConceptXstudent->total_paid + $oConceptXstudent->total_discount) >= $oConceptXstudent->original_amount){
             $oConceptXstudent->already_paid = 1;
@@ -483,6 +523,14 @@ public function saveDocumentPayment(Request $request)
 
     //END UPDATE PAYMENT
 
+    //SHOW DOCUMENT
+
+    public function Payments_show_document($id_md5)    
+    {
+        $oDocument_Header = payment_document::find(Hashids::decode($id_md5)[0]-1000);
+        $cDocument_Body = payment_document_line::where("id_document_payment",$oDocument_Header->id)->get();
+        return view('cms.payment.showPaymentDocument.document', compact('oDocument_Header','cDocument_Body'));
+    }
 
     /**
      * Display a listing of the resource.

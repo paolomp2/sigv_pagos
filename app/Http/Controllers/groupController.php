@@ -61,6 +61,7 @@ class groupController extends Controller
         $gc->create = true;
         $gc->select = true;
         $gc->form = true;
+        $gc->date = true;
         $gc->url_base = "groups";
         $gc->page_name = "Crear nuevo grupo de alumnos";
         $gc->page_description = "Inserte los campos requeridos";
@@ -81,7 +82,8 @@ class groupController extends Controller
 
         $group = new Group;
         $group->name = $request->name;
-        $group->description = $request->description;    
+        $group->description = $request->description;
+        $group->expiration_date = $request->expiration_date;
         $group->year = $config->year;
         $group->save();
 
@@ -113,6 +115,7 @@ class groupController extends Controller
         $gc->page_name = "Editar Descuento";
         $gc->description = "Modifique los datos necesarios";
         $gc->select=true;
+        $gc->date = true;
         $gc->url_base = "groups";
         $gc->entity_to_edit=$group;
         $gc->form = true;
@@ -129,10 +132,11 @@ class groupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $hroup = Group::find($id);
-        $hroup->name = $request->name;
-        $hroup->description = $request->description;
-        $hroup->save();
+        $group = Group::find($id);
+        $group->name = $request->name;
+        $group->description = $request->description;
+        $group->expiration_date = $request->expiration_date;
+        $group->save();
 
         return Redirect::to('/groups');
     }
@@ -221,8 +225,10 @@ class groupController extends Controller
         {
             $student = Student::find($id_student);
             $student->enrolled_flag = 0;
-            $student->save();
         }
+
+        $group->num_people -= 1;
+        $group->save();
 
         return Redirect::to('/groups/'.$id_group.'/add');
     }
