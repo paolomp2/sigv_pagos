@@ -10,7 +10,7 @@ use sigc\Http\Containers\generalContainer;
 use Illuminate\Database\Eloquent\Collection;
 
 use sigc\Group;
-use sigc\studentxgroupxyear;
+use sigc\studentXgroupXyear;
 use sigc\Student;
 use sigc\Configuration;
 
@@ -212,7 +212,7 @@ class groupController extends Controller
         $id_group_dec = Hashids::decode($id_group)[0]-1000;
         $id_student = Hashids::decode($id_student)[0]-1000;
 
-        $pivot = studentxgroupxyear::where('id_group',$id_group_dec)->where('id_student',$id_student)->first();
+        $pivot = studentXgroupXyear::where('id_group',$id_group_dec)->where('id_student',$id_student)->first();
         $pivot->delete();
 
         $group = Group::find($id_group_dec);
