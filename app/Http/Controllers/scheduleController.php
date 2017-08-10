@@ -425,8 +425,8 @@ class scheduleController extends Controller
                                         sxgxy.id_student = $iId_student and
                                         sxgxy.deleted_at is null
                                 )   
-                        )"
+                        )";
 
-        DB::select(DB::raw($sQuery));
+        return DB::select(DB::raw($sQuery));
     }
 }
