@@ -29,7 +29,7 @@
                 <tr>
 
                   <th scope="row">{!!$i!!}</th>
-                  <td>{!!$group->description!!}</td>
+                  <td>{!!$group->name!!}</td>
                   
                   <td>{!!$group->num_people!!}</td>
                   
