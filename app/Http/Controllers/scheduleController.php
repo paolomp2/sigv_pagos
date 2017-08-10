@@ -427,6 +427,6 @@ class scheduleController extends Controller
                                 )   
                         )"
 
-        return DB::select(DB::raw($sQuery));
+        DB::select(DB::raw($sQuery));
     }
 }
