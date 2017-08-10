@@ -5,7 +5,7 @@
     <select id="select_student_group" name="select_student_group" class="select2_single form-control">
 	<option value="-1">Seleccione un grupo alumno</option>
       @foreach($gc->groups_students as $group_student)
-      <option value="{!!$group_student->id_md5!!}">{!!$group_student->year!!} - {!!$group_student->description!!}</option>
+      <option value="{!!$group_student->id_md5!!}">{!!$group_student->year!!} - {!!$group_student->name!!}</option>
       @endforeach      
     </select>
   </div>

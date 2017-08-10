@@ -266,7 +266,7 @@ class conceptController extends Controller
         $gc->url_base="concepts";
         $gc->entity_to_edit = $concept;
         $gc->groups_students = Group::where('year', $concept->year)->orderBy('identifier','description')->get();
-        dd($gc->groups_students);   
+        
 
         return view('cms.concepts.push_add', compact('gc'));
     }
