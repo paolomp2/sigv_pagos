@@ -214,6 +214,7 @@ class discountController extends Controller
 
     public function list_groups($id)
     {
+
         $discount = Discount::find(Hashids::decode($id)[0]-1000);
         if(is_null($discount))
         {
@@ -228,10 +229,12 @@ class discountController extends Controller
         $gc->page_description = "Esta lista contiene grupos de descuentos";
         $gc->entity_to_edit = $discount;
 
-        $gc->groups = Group::whereHas('discountxgroup', function($q) use($discount){
+        $gc->groups = Group::whereHas('discountXgroup', function($q) use($discount){
                                     $q->where('id_discount', $discount->id);
                                 })->orderBy("year","Desc")->get();
+        
         $gc->url_base="discounts";
+
         return view('cms.discounts.list_add', compact('gc'));
     }
 

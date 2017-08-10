@@ -30,7 +30,7 @@ class Group extends Model
 
     public function discountxgroup($value='')
     {
-        return $this->hasMany('sigc\discountxgroup', 'id_group');
+        return $this->hasMany('sigc\discountXgroup', 'id_group');
     }
 
     public function interestxgroup($value='')
