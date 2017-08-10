@@ -265,7 +265,8 @@ class conceptController extends Controller
         $gc->page_description = "Seleccione los grupos y luego de click en confirmar";
         $gc->url_base="concepts";
         $gc->entity_to_edit = $concept;
-        $gc->groups_students = Group::where('year', $concept->year)->orderBy('identifier','description')->get();        
+        $gc->groups_students = Group::where('year', $concept->year)->orderBy('identifier','description')->get();
+        gg($gc->groups_students);   
 
         return view('cms.concepts.push_add', compact('gc'));
     }
