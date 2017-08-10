@@ -220,6 +220,7 @@ class groupController extends Controller
         $pivot->delete();
 
         $group = Group::find($id_group_dec);
+        
         //Caso en que eliminamos un alumno de un grupo que es aula
         if($group->classroom_flag==1)
         {
@@ -229,6 +230,10 @@ class groupController extends Controller
 
         $group->num_people -= 1;
         $group->save();
+
+        //Update the concepts
+        $oSchedule = new scheduleController;
+        $oSchedule->refresh_debts_students($id_student);
 
         return Redirect::to('/groups/'.$id_group.'/add');
     }

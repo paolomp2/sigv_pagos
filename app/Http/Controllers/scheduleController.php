@@ -402,4 +402,31 @@ class scheduleController extends Controller
     {
         $this->apply_discount_to_group($id_discount,0,$flag_enrollment_remove);
     }
+
+    public function refresh_debts_students($iId_student)
+    {
+        $sQuery = "update conceptxstudent cxs
+                    set deleted_at = now()
+                    where
+                        cxs.id_student = $iId_student and
+                        cxs.id_concept not in(
+                            select 
+                                cxg.id_concept
+                            from
+                                conceptxgroup cxg
+                            where
+                                cxg.deleted_at is null and
+                                cxg.id_group in(
+                                    select
+                                        sxgxy.id_group
+                                    from
+                                        studentxgroupxyear sxgxy
+                                    where
+                                        sxgxy.id_student = $iId_student and
+                                        sxgxy.deleted_at is null
+                                )   
+                        )"
+
+        return DB::select(DB::raw($sQuery));
+    }
 }
