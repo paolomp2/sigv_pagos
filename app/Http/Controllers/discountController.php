@@ -232,7 +232,7 @@ class discountController extends Controller
         $gc->groups = Group::whereHas('discountXgroup', function($q) use($discount){
                                     $q->where('id_discount', $discount->id);
                                 })->orderBy("year","Desc")->get();
-        
+
         $gc->url_base="discounts";
 
         return view('cms.discounts.list_add', compact('gc'));
@@ -265,7 +265,10 @@ class discountController extends Controller
                             from concepts c
                             where
                                 c.id_concept_group = $discount->id_concept_group
-                        )
+                                and c.deleted_at is null
+                        ) and
+                        g.deleted_at is null and
+                        cxg.deleted_at is null
                     group by id
                     ;";
         $gc->groups_students = DB::select(DB::raw($sQuery));
