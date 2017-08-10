@@ -29,7 +29,7 @@ class groupController extends Controller
      */
     public function index()
     {
-        $groups = Group::where('classroom_flag',0)->where('identifier',0)->get();
+        $groups = Group::where('classroom_flag',0)->where('identifier',0)->orderBy('name')->get();
 
         foreach ($groups as $group) {
             if($group->id_md5==""){
