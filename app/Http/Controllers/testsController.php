@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use sigc\Http\Requests;
 use sigc\Http\Controllers\Controller;
+use sigc\Http\Controllers\scheduleController;
 
 use sigc\Schedule;
 use sigc\Concept;
@@ -17,6 +18,7 @@ use sigc\conceptxinterest;
 use sigc\Student;
 use sigc\Interest;
 use sigc\Discount;
+
 
 use Vinkla\Hashids\Facades\Hashids;
 use Auth;
@@ -131,10 +133,12 @@ class testsController extends Controller
 
     public function white($value='')
     {
-        $password = bcrypt('Baddesita');
+        
 
-        dd($password);
-
-        return view('white','$data'); 
+        $students = Student::all();
+        $oSchedule = new scheduleController;
+        foreach ($students as $student) {
+            $oSchedule->refresh_debts_students($student->id);
+        }
     }
 }
