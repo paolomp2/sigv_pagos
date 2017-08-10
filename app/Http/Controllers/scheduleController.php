@@ -427,6 +427,30 @@ class scheduleController extends Controller
                                 )   
                         )";
 
-        return DB::select(DB::raw($sQuery));
+        DB::select(DB::raw($sQuery));
+
+        $sQuery = "update conceptxstudent cxs
+                    set deleted_at = null
+                    where
+                        cxs.id_student = $iId_student and
+                        cxs.id_concept in(
+                            select 
+                                cxg.id_concept
+                            from
+                                conceptxgroup cxg
+                            where
+                                cxg.deleted_at is null and
+                                cxg.id_group in(
+                                    select
+                                        sxgxy.id_group
+                                    from
+                                        studentxgroupxyear sxgxy
+                                    where
+                                        sxgxy.id_student = $iId_student and
+                                        sxgxy.deleted_at is null
+                                )   
+                        )";
+
+        DB::select(DB::raw($sQuery));
     }
 }
