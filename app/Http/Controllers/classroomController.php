@@ -301,8 +301,7 @@ class classroomController extends Controller
         $config = Configuration::where('current',1)->first();
 
         $students = Student::whereHas('studentxgroupxyear',function($q) use($classroom,$config){
-                    $q->where('year',$config->year)
-                    ->where('id_group',$classroom->id);
+                    $q->where('id_group',$classroom->id);
                 })->orderBy('created_at', 'desc')->get();
         
         $gc =  new generalContainer;

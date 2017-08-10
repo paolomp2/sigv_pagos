@@ -382,17 +382,17 @@ class studentController extends Controller
             $sheet = $reader->getSheetByName('Hoja1');
 
             $i = 1;            
-            while ($sheet->getCellByColumnAndRow(0,$i)<> "") {                
-                    
+            while ($sheet->getCellByColumnAndRow(1,$i)<> "") {                
+                
                 $student = new Student;
 
                 $oBulckContainer->num_students++;
                 $oBulckContainer->num_students_aux++;
-                $student->full_name = $sheet->getCellByColumnAndRow(0,$i);
-
-                if($student->full_name="")
+                $student->full_name = $sheet->getCellByColumnAndRow(1,$i)->getValue();
+                
+                if($student->full_name=="")
                     continue;
-
+                
                 $student->full_name = str_replace("  "," ",$student->full_name);
 
                 $student_name_array = explode(" ",$student->full_name);
@@ -435,6 +435,8 @@ class studentController extends Controller
 
                 $mClassroom->num_people = $mClassroom->num_people + 1;
                 $mClassroom->save();
+
+
 
                 //adding concept
                 $cConceptxgroup = conceptXgroup::where('id_group',$mClassroom->id)->get();
