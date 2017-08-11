@@ -235,7 +235,7 @@ public function getConceptsByStudentID($iId_student)
     return DB::select(DB::raw($sQuery));
 }
 
-public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate, $bOnlyMaxDiscount)
+public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate)
 {
 
     $sConditionExpirationDateConcept = "";
