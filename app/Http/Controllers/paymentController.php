@@ -338,7 +338,7 @@ public function getInterestsByStudentOrderByConcept($iId_student, $bConsiderExpi
                 ixg.deleted_at is null
                 $sConditionExpirationDateConcept
                 ";
-
+    dd(DB::select(DB::raw($sQuery));
     return DB::select(DB::raw($sQuery));
 }
 
