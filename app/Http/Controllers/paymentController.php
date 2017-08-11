@@ -294,7 +294,7 @@ public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpi
         $iLastConceptKey = $iConceptKey;
     }
 
-    return DB::select(DB::raw($sQuery));
+    return $cDicounts;
 }
 
 public function getInterestsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate)
