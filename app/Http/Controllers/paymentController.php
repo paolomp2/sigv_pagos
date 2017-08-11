@@ -280,22 +280,20 @@ public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpi
                 dxg.deleted_at is null and
                 cxg.deleted_at is null
                 $sConditionExpirationDateConcept
-            order by c.year desc, c.id asc, d.name asc, d.id asc";
+            order by c.year desc, c.id asc, amount desc, d.name asc, d.id asc";
 
     $cDicounts = DB::select(DB::raw($sQuery));
-    /*
+    
     $iLastConceptKey = -1;
     foreach ($cDicounts as $key => $oDicounts) {
         
         $iConceptKey = $oDicounts->id_concept;
         if ($iLastConceptKey == $iConceptKey) {
-            $cDicounts->remove($oDicounts);
+            unset($cDicounts[$key]);
         }
         $iLastConceptKey = $iConceptKey;
     }
 
-    dd($cDicounts);
-*/
     return DB::select(DB::raw($sQuery));
 }
 
