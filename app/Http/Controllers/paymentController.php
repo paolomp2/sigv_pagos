@@ -324,7 +324,7 @@ public function getInterestsByStudentOrderByConcept($iId_student, $bConsiderExpi
                 datediff(Now(),c.fecha_vencimiento) as days_diff,
                 if(i.percentage_flag, 
                     (if((datediff(Now(),c.fecha_vencimiento) div i.recurrence ) > i.recurrence,i.num_times,(datediff(Now(),c.fecha_vencimiento) div i.recurrence ))) * c.amount * i.amount / 100 , 
-                    (if((datediff(Now(),c.fecha_vencimiento) div i.recurrence ) > i.recurrence,i.num_times,(datediff(Now(),c.fecha_vencimiento) div i.recurrence ))) * i.amount) as as amount
+                    (if((datediff(Now(),c.fecha_vencimiento) div i.recurrence ) > i.recurrence,i.num_times,(datediff(Now(),c.fecha_vencimiento) div i.recurrence ))) * i.amount) as amount
             from interests i, interestxgroup ixg, concepts c
             where 
                 i.id = ixg.id_interest and
