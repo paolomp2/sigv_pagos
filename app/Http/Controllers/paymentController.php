@@ -235,7 +235,7 @@ public function getConceptsByStudentID($iId_student)
     return DB::select(DB::raw($sQuery));
 }
 
-public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate)
+public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate, $bOnlyMaxDiscount)
 {
 
     $sConditionExpirationDateConcept = "";
@@ -281,7 +281,21 @@ public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpi
                 cxg.deleted_at is null
                 $sConditionExpirationDateConcept
             order by c.year desc, c.id asc, d.name asc, d.id asc";
-    
+
+    $cDicounts = DB::select(DB::raw($sQuery));
+
+    $iLastConceptKey = -1;
+    foreach ($cDicounts as $key => $oDicounts) {
+        
+        $iConceptKey = $oDicounts->id_concept;
+        if ($iLastConceptKey == $iConceptKey) {
+            $cDicounts->forget($key);
+        }
+        $iLastConceptKey = $iConceptKey;
+    }
+
+    dd($cDicounts);
+
     return DB::select(DB::raw($sQuery));
 }
 
