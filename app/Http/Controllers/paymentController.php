@@ -283,19 +283,19 @@ public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpi
             order by c.year desc, c.id asc, d.name asc, d.id asc";
 
     $cDicounts = DB::select(DB::raw($sQuery));
-
+    /*
     $iLastConceptKey = -1;
     foreach ($cDicounts as $key => $oDicounts) {
         
         $iConceptKey = $oDicounts->id_concept;
         if ($iLastConceptKey == $iConceptKey) {
-            $cDicounts->forget($key);
+            $cDicounts->remove($oDicounts);
         }
         $iLastConceptKey = $iConceptKey;
     }
 
     dd($cDicounts);
-
+*/
     return DB::select(DB::raw($sQuery));
 }
 
