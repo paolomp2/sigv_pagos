@@ -322,7 +322,9 @@ public function getInterestsByStudentOrderByConcept($iId_student, $bConsiderExpi
                 c.name as concept_name, 
                 i.name, 
                 datediff(Now(),c.fecha_vencimiento) as days_diff,
-                if(i.percentage_flag, datediff(Now(),c.fecha_vencimiento) * c.amount * i.amount / 100 , datediff(Now(),c.fecha_vencimiento) * i.amount) as amount
+                if(i.percentage_flag, 
+                    (if((datediff(Now(),c.fecha_vencimiento) div i.recurrence ) > i.recurrence,i.num_times,(datediff(Now(),c.fecha_vencimiento) div i.recurrence ))) * c.amount * i.amount / 100 , 
+                    (if((datediff(Now(),c.fecha_vencimiento) div i.recurrence ) > i.recurrence,i.num_times,(datediff(Now(),c.fecha_vencimiento) div i.recurrence ))) * i.amount) 
             from interests i, interestxgroup ixg, concepts c
             where 
                 i.id = ixg.id_interest and
@@ -338,8 +340,7 @@ public function getInterestsByStudentOrderByConcept($iId_student, $bConsiderExpi
                 ixg.deleted_at is null
                 $sConditionExpirationDateConcept
                 ";
-    dd($sQuery);
-    dd(DB::select(DB::raw($sQuery)));
+    
     return DB::select(DB::raw($sQuery));
 }
 
