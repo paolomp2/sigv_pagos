@@ -281,7 +281,7 @@ public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpi
                 cxg.deleted_at is null
                 $sConditionExpirationDateConcept
             order by c.year desc, c.id asc, d.name asc, d.id asc";
-
+    dd($sQuery);
     return DB::select(DB::raw($sQuery));
 }
 
