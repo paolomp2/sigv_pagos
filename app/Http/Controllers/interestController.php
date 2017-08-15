@@ -117,7 +117,7 @@ class interestController extends Controller
         $gc->url_base = "interests";
         $gc->entity_to_edit = Interest::find(Hashids::decode($id)[0]-1000);
         $gc->concepts_groups = Concept_group::where("year",$config->year)->get();     
-        $gc->concepts_groups_id = $gc->entity_to_edit->Concepts_groups()->getRelatedIds()->toArray();
+        //$gc->concepts_groups_id = $gc->entity_to_edit->Concepts_groups()->getRelatedIds()->toArray();
         /*echo dd($gc->concepts_groups_id->toArray());*/
 
         /*foreach ($gc->concepts_groups as $concept_group) {

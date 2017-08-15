@@ -495,7 +495,7 @@ public function saveDocumentPayment(Request $request)
 
         if(count($document_number)>0){
             
-            $cDocumentLine = Payment_document_line::where("id_document_payment",$document_number->id)->get();
+            $cDocumentLine = Payment_document_line::where("id_document_payment",$document_number->id)->orderBy("type_entity")->get();
             
             $ilastIdConcept = -1;
             foreach ($cDocumentLine as $oDocumentLine) {
