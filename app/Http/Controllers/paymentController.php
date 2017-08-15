@@ -498,7 +498,7 @@ public function saveDocumentPayment(Request $request)
             $cDocumentLine = Payment_document_line::where("id_document_payment",$document_number->id)->orderBy("type_entity")->get();
             
             $ilastIdConcept = -1;
-            //dd($cDocumentLine);
+            dd($cDocumentLine);
             foreach ($cDocumentLine as $oDocumentLine) {
                 if ($oDocumentLine->type_entity == "CONCEPT") {                    
                     //GET DEBT OF STUDENT
