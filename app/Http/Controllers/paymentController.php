@@ -502,17 +502,17 @@ public function saveDocumentPayment(Request $request)
             foreach ($cDocumentLine as $oDocumentLine) {
                 if ($oDocumentLine->type_entity == "CONCEPT") {                    
                     //GET DEBT OF STUDENT
-                    $ilastIdConcept = $oDocumentLine->type_entity;
+                    $ilastIdConcept = $oDocumentLine->id_entity;
                     $oConceptXstudent = conceptxstudent::where("id_student",$document_number->id_student)->where("id_concept",$oDocumentLine->id_entity)->first();
                     $oConceptXstudent->total_paid -= $oDocumentLine->amount;
                     $oConceptXstudent->already_paid = 0;
-                    //$oConceptXstudent->save();
+                    $oConceptXstudent->save();
                 }
 
                 if ($oDocumentLine->type_entity == "INTEREST") {
                     //GET DEBT OF STUDENT
                     $oConceptXstudent = conceptxstudent::where("id_student",$document_number->id_student)->where("id_concept",$ilastIdConcept)->first();
-                    dd($ilastIdConcept);
+                    //dd($ilastIdConcept);
                     $oConceptXstudent->total_interest -= $oDocumentLine->amount;
                     $oConceptXstudent->already_paid = 0;
                     $oConceptXstudent->save();
