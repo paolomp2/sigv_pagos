@@ -68,9 +68,9 @@ class reportController extends Controller
                     sxgxy.deleted_at is null
 				Group by
 					c.id
-				Order by
-					c.id_concept_group asc,
-					c.fecha_vencimiento asc";
+				Order by					
+                    c.fecha_vencimiento asc,
+                    c.name";
 
         $concepts = DB::select(DB::raw($sQuery));
 
