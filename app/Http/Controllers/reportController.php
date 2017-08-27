@@ -60,7 +60,12 @@ class reportController extends Controller
 					c.id = cxs.id_concept and
 					g.id = $request->classroom_id and
 					sxgxy.id_group = g.id and
-					sxgxy.id_student = s.id
+					sxgxy.id_student = s.id and
+                    c.deleted_at is null and
+                    s.deleted_at is null and
+                    cxs.deleted_at is null and
+                    g.deleted_at is null and
+                    sxgxy.deleted_at is null
 				Group by
 					c.id
 				Order by
@@ -81,7 +86,12 @@ class reportController extends Controller
 					c.id = cxs.id_concept and
 					g.id = $request->classroom_id and
 					sxgxy.id_group = g.id and
-					sxgxy.id_student = s.id
+					sxgxy.id_student = s.id and
+                    c.deleted_at is null and
+                    s.deleted_at is null and
+                    cxs.deleted_at is null and
+                    g.deleted_at is null and
+                    sxgxy.deleted_at is null
 				Order by
 					fullname,
 					c.id_concept_group asc,
