@@ -51,26 +51,20 @@ class reportController extends Controller
     						->get();
 
 		//get all Concepts
-        $sQuery = "select 
-					c.id, c.name
-				from
-					students s, conceptxstudent cxs, concepts c, groups g, studentxgroupxyear sxgxy
-				where
-					s.id = cxs.id_student and
-					c.id = cxs.id_concept and
-					g.id = $request->classroom_id and
-					sxgxy.id_group = g.id and
-					sxgxy.id_student = s.id and
-                    c.deleted_at is null and
-                    s.deleted_at is null and
-                    cxs.deleted_at is null and
-                    g.deleted_at is null and
-                    sxgxy.deleted_at is null
-				Group by
-					c.id
-				Order by					
-                    c.fecha_vencimiento asc,
-                    c.name";
+        $sQuery =   "
+                    select 
+                        c.id, c.name, c.fecha_vencimiento, cxs.id, sxg.id
+                    from
+                        concepts c
+                    left join conceptxstudent cxs on
+                        c.id = cxs.id_concept
+                    left join studentxgroupxyear sxg on
+                        cxs.id_student = sxg.id_student
+                    where
+                        sxg.id_group = $request->classroom_id 
+                    GROUP BY
+                        c.name
+                    ";
 
         $concepts = DB::select(DB::raw($sQuery));
 
