@@ -63,6 +63,7 @@ class reportController extends Controller
                     where
                         sxg.id_group = $request->classroom_id 
                     GROUP BY
+                        c.fecha_vencimiento,
                         c.name
                     ";
 
