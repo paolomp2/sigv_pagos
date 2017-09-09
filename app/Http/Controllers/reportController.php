@@ -65,6 +65,8 @@ class reportController extends Controller
                     GROUP BY
                         c.fecha_vencimiento,
                         c.name
+                    ORDER BY
+                        c.fecha_vencimiento
                     ";
 
         $concepts = DB::select(DB::raw($sQuery));
