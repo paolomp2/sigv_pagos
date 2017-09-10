@@ -91,7 +91,7 @@ class reportController extends Controller
                     g.deleted_at is null and
                     sxgxy.deleted_at is null
 				Order by
-					fullname,
+					s.full_name,
 					c.fecha_vencimiento, c.name, c.id";
 
         $consolidatedDebtReportGrid = DB::select(DB::raw($sQuery));
