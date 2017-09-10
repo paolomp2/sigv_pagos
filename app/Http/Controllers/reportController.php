@@ -74,7 +74,7 @@ class reportController extends Controller
 
 		//get all students x concept
 		$sQuery = "select 
-					CONCAT(s.last_name,' ',s.maiden_name,', ',s.first_name) as fullname, 
+					s.fullname, 
 					c.id,
 					IF(cxs.already_paid=0,cxs.original_amount-cxs.total_paid,0) as debt
 				from
