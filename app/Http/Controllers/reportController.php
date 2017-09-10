@@ -71,6 +71,8 @@ class reportController extends Controller
 
         $concepts = DB::select(DB::raw($sQuery));
 
+        dd($concepts);
+
 		//get all students x concept
 		$sQuery = "select 
 					CONCAT(s.last_name,' ',s.maiden_name,', ',s.first_name) as fullname, 
