@@ -66,12 +66,12 @@ class reportController extends Controller
                         c.fecha_vencimiento,
                         c.name
                     ORDER BY
-                        c.fecha_vencimiento
+                        c.id_concept_group,
+                        c.fecha_vencimiento, c.id
                     ";
 
         $concepts = DB::select(DB::raw($sQuery));
-
-        dd($concepts);
+        
 
 		//get all students x concept
 		$sQuery = "select 
@@ -93,8 +93,8 @@ class reportController extends Controller
                     sxgxy.deleted_at is null
 				Order by
 					fullname,
-					c.id_concept_group asc,
-					c.fecha_vencimiento asc";
+					c.id_concept_group,
+					c.fecha_vencimiento, c.id";
 
         $consolidatedDebtReportGrid = DB::select(DB::raw($sQuery));
 
