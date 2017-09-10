@@ -74,7 +74,7 @@ class reportController extends Controller
 
 		//get all students x concept
 		$sQuery = "select 
-					s.full_name, 
+					s.full_name as fullname, 
 					c.id,
 					IF(cxs.already_paid=0,cxs.original_amount-cxs.total_paid,0) as debt
 				from
@@ -91,7 +91,7 @@ class reportController extends Controller
                     g.deleted_at is null and
                     sxgxy.deleted_at is null
 				Order by
-					s.full_name,
+					fullname,
 					c.fecha_vencimiento, c.name, c.id";
 
         $consolidatedDebtReportGrid = DB::select(DB::raw($sQuery));
