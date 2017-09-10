@@ -53,7 +53,7 @@ class reportController extends Controller
 		//get all Concepts
         $sQuery =   "
                     select 
-                        c.id, c.name, c.fecha_vencimiento, cxs.id, sxg.id
+                        c.id, c.name, c.fecha_vencimiento
                     from
                         concepts c
                     left join conceptxstudent cxs on
