@@ -74,7 +74,7 @@ class reportController extends Controller
 
 		//get all students x concept
 		$sQuery = "select 
-					s.fullname, 
+					s.full_name, 
 					c.id,
 					IF(cxs.already_paid=0,cxs.original_amount-cxs.total_paid,0) as debt
 				from
