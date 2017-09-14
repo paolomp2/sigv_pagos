@@ -105,7 +105,8 @@ class reportController extends Controller
     public function paymentsByDatesReportGet()
     {
     	$gc = new generalContainer;
-        $dtMinDate = Payment_Document::min('date_sell')->get()->date_sell;
+        $dtMinDate = Payment_Document::min('date_sell')->get();
+        dd($dtMinDate);
     	return view('cms.reports.paymentsByDatesReport', compact('gc'));
     }
 
