@@ -29,7 +29,7 @@
     </label>
     <div class="col-md-2 col-sm-12 col-xs-12">
       <div class="controls">                          
-          <input required="required" type="text" class="form-control has-feedback-left" id="dateTo" name="dateTo" placeholder="Fecha fin" aria-describedby="inputSuccess2Status2">
+          <input required="required" type="text" class="form-control has-feedback-left" id="dateTo" name="dateTo" placeholder="Fecha fin" aria-describedby="inputSuccess2Status2" value="{!!$dtMaxDate!!}" >
           <span class="fa fa-calendar-o form-control-feedback left" aria-hidden="true"></span>                  
       </div>
     </div>
