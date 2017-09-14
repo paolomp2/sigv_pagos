@@ -24,13 +24,13 @@
     <!-- sidebar menu -->
     <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
       <p>
-      @if($gc->id_rol==1)
+      
       <div class="menu_section">
         <h3>&nbsp</h3>
         
         <h3>Pagos</h3>
         <ul class="nav side-menu">
-          
+          @if($gc->id_rol==1)
           <li><a><i class="fa fa-pencil-square-o"></i> Conceptos de Pagos<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu" style="display: none">
               <li><a href="/concepts_groups/">Grupos de Conceptos</a></li>
@@ -44,6 +44,7 @@
               <li><a href="/interests">Intereses</a></li>
             </ul>
           </li>
+          @endif
           <li><a><i class="fa fa-money"></i> Realizar pagos<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu" style="display: none">
               <li><a href="/showListStudents/">Realizar pagos</a></li>
@@ -53,8 +54,8 @@
           </li>
         </ul>
       </div>
-      @endif
-      @if($gc->id_rol==1)
+      
+      
       <div class="menu_section">
         <h3>Infraestructura</h3>
         <ul class="nav side-menu">
@@ -72,7 +73,7 @@
           </li>--> 
         </ul>
       </div>
-      @endif
+      
       <div class="menu_section">
         <h3>Alumnos y Familiares</h3>
         <ul class="nav side-menu">
@@ -120,6 +121,7 @@
           </li>--> 
         </ul>
       </div>
+      @if($gc->id_rol==1)
       <div class="menu_section">
         <h3>TESTS</h3>
         <ul class="nav side-menu">
@@ -137,6 +139,7 @@
           </li>--> 
         </ul>
       </div>
+      @endif
     </div>
     <!-- /sidebar menu -->
 
