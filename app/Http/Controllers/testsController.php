@@ -8,6 +8,8 @@ use sigc\Http\Requests;
 use sigc\Http\Controllers\Controller;
 use sigc\Http\Controllers\scheduleController;
 
+use Illuminate\Support\Facades\Hash;
+
 use sigc\Schedule;
 use sigc\Concept;
 use sigc\Group;
