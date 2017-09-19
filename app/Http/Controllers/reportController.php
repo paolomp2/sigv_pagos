@@ -127,8 +127,7 @@ class reportController extends Controller
         $sWhereStudent = "";
 
         if($iId_student > 0){
-            $sWhereStudent = "pd.id_student = $request->StudetId";
-            dd($sWhereStudent);
+            $sWhereStudent = "pd.id_student = $iId_student";
         };
 
         $sQuery =   "
