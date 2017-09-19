@@ -115,7 +115,7 @@ class reportController extends Controller
 
     public function paymentsByDatesReport(Request $request)
     {   
-        $iId_student=Hashids::decode($request->$id_student)[0]-1000;
+        $iId_student=Hashids::decode($request->$student)[0]-1000;
     	$gc = new generalContainer;
     	$gc->dateFrom = $request->dateFrom;
     	$gc->dateTo = $request->dateTo;

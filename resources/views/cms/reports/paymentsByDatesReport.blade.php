@@ -35,17 +35,17 @@
   </div>
 
   <div class="form-group">
-        <label class="control-label col-md-3 col-sm-3 col-xs-12">seleccione alumno*</label>
-        <div class="col-md-6 col-sm-12 col-xs-12">
-          <select id="student" name="student" class="select2_single form-control">
-            @foreach($gc->students as $student)
-              <option value="{!!$student->id_md5!!}">
-                {!!$student->full_name!!}
-          </option>
-            @endforeach
-          </select>
-        </div>
-    </div>
+    <label class="control-label col-md-3 col-sm-3 col-xs-12">seleccione alumno*</label>
+    <div class="col-md-6 col-sm-12 col-xs-12">
+      <select id="student" name="student" class="select2_single form-control">
+        @foreach($gc->students as $student)
+          <option value="{!!$student->id_md5!!}">
+            {!!$student->full_name!!}
+        </option>
+          @endforeach
+        </select>
+      </div>
+  </div>
   
   <div class="ln_solid"></div>
   <div class="form-group">
@@ -132,6 +132,9 @@
       format: "YYYY-MM-DD",
     }, function(start, end, label) {
       console.log(start.toISOString(), end.toISOString(), label);
+    });
+    $(document).ready(function() {
+      $(".select2_single").select2();  
     });
   </script>
 @endsection
