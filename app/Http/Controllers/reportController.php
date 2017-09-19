@@ -125,7 +125,7 @@ class reportController extends Controller
         $gc->students = Student::where("year",$config->year)->get();
 
         $sWhereStudent = "";
-        if($request->iId_student > 0){
+        if($iId_student > 0){
             $sWhereStudent = "pd.id_student = $request->StudetId";
         };
 
@@ -137,13 +137,11 @@ class reportController extends Controller
                             left join students s on
                                 pd.id_student = s.id
                         where                            
-                            pd.date_sell >= $request->dateFrom and
-                            pd.date_sell <= $request->dateTo and
+                            pd.date_sell >= '$request->dateFrom' and
+                            pd.date_sell <= '$request->dateTo and'
                             $sWhereStudent
                             1 = 1
                     ";
-
-        dd($sQuery);
 
     	$gc->payment_documents = DB::select(DB::raw($sQuery));           
         
