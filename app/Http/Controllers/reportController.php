@@ -138,7 +138,7 @@ class reportController extends Controller
                                 pd.id_student = s.id
                         where                            
                             pd.date_sell >= '$request->dateFrom' and
-                            pd.date_sell <= '$request->dateTo and'
+                            pd.date_sell <= '$request->dateTo' and
                             $sWhereStudent
                             1 = 1
                     ";
