@@ -38,8 +38,11 @@
     <label class="control-label col-md-3 col-sm-3 col-xs-12">seleccione alumno*</label>
     <div class="col-md-6 col-sm-12 col-xs-12">
       <select id="student" name="student" class="select2_single form-control">
+        <option value="0">
+          Todos los alumnos
+        </option>    
         @foreach($gc->students as $student)
-          <option value="{!!$student->id_md5!!}">
+          <option value="{!!$student->id!!}">
             {!!$student->full_name!!}
         </option>
           @endforeach

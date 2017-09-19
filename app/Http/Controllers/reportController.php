@@ -116,7 +116,7 @@ class reportController extends Controller
     public function paymentsByDatesReport(Request $request)
     {   
         
-        $iId_student=Hashids::decode($request->student)[0]-1000;
+        $iId_student=$request->student;
     	$gc = new generalContainer;
     	$gc->dateFrom = $request->dateFrom;
     	$gc->dateTo = $request->dateTo;
@@ -142,6 +142,8 @@ class reportController extends Controller
                             $sWhereStudent
                             1 = 1
                     ";
+
+        dd($sQuery);
 
     	$gc->payment_documents = DB::select(DB::raw($sQuery));           
         
