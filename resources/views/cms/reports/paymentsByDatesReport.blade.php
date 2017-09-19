@@ -3,8 +3,7 @@
   $gc->default_buttons  = false;
   $gc->table            = true;
   $gc->date             = true;
-  $gc->page_name = "Pagos por fechas";
-  
+  $gc->page_name = "Pagos por fechas";  
 ?>
 
 @extends('cms.templates.template')
@@ -33,7 +32,20 @@
           <span class="fa fa-calendar-o form-control-feedback left" aria-hidden="true"></span>                  
       </div>
     </div>
-  </div>     
+  </div>
+
+  <div class="form-group">
+        <label class="control-label col-md-3 col-sm-3 col-xs-12">seleccione alumno*</label>
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <select id="student" name="student" class="select2_single form-control">
+            @foreach($gc->students as $student)
+              <option value="{!!$student->id_md5!!}">
+                {!!$student->full_name!!}
+          </option>
+            @endforeach
+          </select>
+        </div>
+    </div>
   
   <div class="ln_solid"></div>
   <div class="form-group">

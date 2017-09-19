@@ -22,6 +22,7 @@ use sigc\StudentXClassroom;
 use sigc\studentXgroupXyear;
 use sigc\Ubigeo;
 use sigc\Payment_document;
+use Vinkla\Hashids\Facades\Hashids;
 
 use Auth;
 use File;
@@ -113,17 +114,33 @@ class reportController extends Controller
 
     public function paymentsByDatesReport(Request $request)
     {   
+        $iId_student=Hashids::decode($request->$id_student)[0]-1000;
     	$gc = new generalContainer;
     	$gc->dateFrom = $request->dateFrom;
     	$gc->dateTo = $request->dateTo;
-        $gc->table = true;        
-    	$gc->payment_documents = Payment_Document::where('date_sell','>=',$request->dateFrom)
-    											->where('date_sell','<=',$request->dateTo)
-    											->OrderBy('correlative_number')
-    											->get();             
+        $gc->table = true;
+
+        $sWhereStudent = "";
+        if($request->iId_student > 0){
+            $sWhereStudent = "id_student = $request->StudetId";
+        };
+
+        $sQuery =   "
+                        select 
+                            * 
+                        from
+                            payment_document
+                        where                            
+                            date_sell >= $request->dateFrom and
+                            date_sell <= $request->dateTo and
+                            $sWhereStudent
+                            1 = 1
+                    ";
+
+    	$gc->payment_documents = DB::select(DB::raw($sQuery));           
         
-        $dtMinDate = DB::table('payment_document')->min('date_sell');
-        $dtMaxDate = DB::table('payment_document')->max('date_sell');
+        $dtMinDate = $request->dateFrom;;
+        $dtMaxDate = $request->dateTo;
 
     	return view('cms.reports.paymentsByDatesReport', compact('gc', 'dtMinDate', 'dtMaxDate'));
     }
