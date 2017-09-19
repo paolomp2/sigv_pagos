@@ -125,9 +125,10 @@ class reportController extends Controller
         $gc->students = Student::where("year",$config->year)->get();
 
         $sWhereStudent = "";
-        dd($iId_student);
+
         if($iId_student > 0){
             $sWhereStudent = "pd.id_student = $request->StudetId";
+            dd($sWhereStudent);
         };
 
         $sQuery =   "
