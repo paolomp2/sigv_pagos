@@ -76,7 +76,7 @@
       <tr>
         <td>{!!$row->date_sell!!}</td>
         <td>{!!$row->correlative_number!!}</td>
-        <td>{!!$row->Student()->full_name!!}</td>
+        <td>{!!$row->full_name!!}</td>
         <td>{!!$row->total_amount!!}</td>
         <?php $bStatus = false;?>
         

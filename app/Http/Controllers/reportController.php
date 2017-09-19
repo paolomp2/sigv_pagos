@@ -121,20 +121,24 @@ class reportController extends Controller
     	$gc->dateFrom = $request->dateFrom;
     	$gc->dateTo = $request->dateTo;
         $gc->table = true;
+        $config = Configuration::where('current',1)->first();        
+        $gc->students = Student::where("year",$config->year)->get();
 
         $sWhereStudent = "";
         if($request->iId_student > 0){
-            $sWhereStudent = "id_student = $request->StudetId";
+            $sWhereStudent = "pd.id_student = $request->StudetId";
         };
 
         $sQuery =   "
                         select 
-                            * 
+                            pd.*, s.full_name
                         from
-                            payment_document
+                            payment_document pd
+                            left join students s on
+                                pd.id_student = s.id
                         where                            
-                            date_sell >= $request->dateFrom and
-                            date_sell <= $request->dateTo and
+                            pd.date_sell >= $request->dateFrom and
+                            pd.date_sell <= $request->dateTo and
                             $sWhereStudent
                             1 = 1
                     ";
