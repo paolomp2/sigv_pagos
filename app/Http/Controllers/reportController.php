@@ -127,7 +127,7 @@ class reportController extends Controller
         $sWhereStudent = "";
 
         if($iId_student > 0){
-            $sWhereStudent = "pd.id_student = $iId_student";
+            $sWhereStudent = "pd.id_student = $iId_student and";
         };
 
         $sQuery =   "
@@ -143,7 +143,6 @@ class reportController extends Controller
                             $sWhereStudent
                             1 = 1
                     ";
-        dd($sQuery);
     	$gc->payment_documents = DB::select(DB::raw($sQuery));           
         
         $dtMinDate = $request->dateFrom;;
