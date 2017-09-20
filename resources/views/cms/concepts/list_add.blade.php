@@ -5,7 +5,7 @@
     $gc->default_buttons = false;
     $gc->add_buttons = true;
     $gc->table = true;
-    $gc->page_name = "Lista de Grupos del Concepto: ".$gc->entity_to_edit->name;
+    $gc->page_name = "Lista de Grupos del Concepto: ".$gc->entity_to_edit->Concept_group->name." - ".$gc->entity_to_edit->name;
     $gc->page_description = "Esta lista contiene grupos de conceptos";
     $gc->breadcrumb('concepts.list_groups.'.$gc->entity_to_edit->id_md5);
 ?>

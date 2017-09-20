@@ -135,13 +135,13 @@ class testsController extends Controller
 
     public function white($value='')
     {
-        $pass = Hash::make("mmaritza");
-        dd($pass);
-        /*ini_set('max_execution_time', 300); //300 seconds = 5 minutes
+        /*$pass = Hash::make("mmaritza");
+        dd($pass);*/
+        ini_set('max_execution_time', 300); //300 seconds = 5 minutes
         $students = Student::all();
         $oSchedule = new scheduleController;
         foreach ($students as $student) {
             $oSchedule->refresh_debts_students($student->id);
-        }*/
+        }
     }
 }
