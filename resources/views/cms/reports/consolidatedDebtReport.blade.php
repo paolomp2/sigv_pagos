@@ -20,7 +20,14 @@ $gc = new generalContainer;
     <div class="col-md-6 col-sm-9 col-xs-12">
       <select required="required" id="classroom_id" name="classroom_id" class="select2_single form-control col-md-12 col-sm-12 col-xs-12">
         @foreach($cClassrooms as $classroom)
-          <option id="{!!$classroom->id!!}" value="{!!$classroom->id!!}">{!!$classroom->name." - ".$classroom->year!!}</option>
+          <option
+            id="{!!$classroom->id!!}"
+            value="{!!$classroom->id!!}"
+            @if($classroom->id == $ClassRoomIdSelected)
+              selected
+            @endif
+            >{!!$classroom->name." - ".$classroom->year!!}            
+          </option>
         @endforeach
       </select>
     </div>

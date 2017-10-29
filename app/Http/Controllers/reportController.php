@@ -40,7 +40,8 @@ class reportController extends Controller
     						->get();
         $concepts = null;
         $ClassRoom_name = "";
-		return view('cms.reports.consolidatedDebtReport', compact('cClassrooms','concepts','ClassRoom_name'));
+        $ClassRoomIdSelected = $cClassrooms[0]->id;        
+		return view('cms.reports.consolidatedDebtReport', compact('cClassrooms','concepts','ClassRoom_name','ClassRoomIdSelected'));
     }
 
     public function consolidatedDebtReport(Request $request)
@@ -96,11 +97,10 @@ class reportController extends Controller
 					c.fecha_vencimiento, c.name, c.id";
 
         $consolidatedDebtReportGrid = DB::select(DB::raw($sQuery));
-
+        $ClassRoomIdSelected = $request->classroom_id;
         $ClassRoom_name = ": ".Group::find($request->classroom_id)->name;
-        //dd($consolidatedDebtReportGrid);
 
-        return view('cms.reports.consolidatedDebtReport', compact('cClassrooms','concepts','consolidatedDebtReportGrid','ClassRoom_name'));
+        return view('cms.reports.consolidatedDebtReport', compact('cClassrooms','concepts','consolidatedDebtReportGrid','ClassRoom_name','ClassRoomIdSelected'));
     }
 
     public function paymentsByDatesReportGet()
