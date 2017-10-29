@@ -140,6 +140,7 @@ class reportController extends Controller
                         where                            
                             pd.date_sell >= '$request->dateFrom' and
                             pd.date_sell <= '$request->dateTo' and
+                            pd.deleted_at is null and
                             $sWhereStudent
                             1 = 1
                     ";
