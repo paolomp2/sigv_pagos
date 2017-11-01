@@ -493,14 +493,14 @@ public function saveDocumentPayment(Request $request)
     {
         $document_number = payment_document::where("correlative_number",$request->document_number)->first();
 
-        
+
 
         $sConfirmationMsg = "Documento de pago no encontrado";
 
         if(count($document_number)>0){
             
             $cDocumentLine = Payment_document_line::where("id_document_payment",$document_number->id)->orderBy("type_entity")->get();
-            dd($cDocumentLine);
+            
             $ilastIdConcept = -1;
             //dd($cDocumentLine);
             foreach ($cDocumentLine as $oDocumentLine) {
@@ -508,6 +508,7 @@ public function saveDocumentPayment(Request $request)
                     //GET DEBT OF STUDENT
                     $ilastIdConcept = $oDocumentLine->id_entity;
                     $oConceptXstudent = conceptxstudent::where("id_student",$document_number->id_student)->where("id_concept",$oDocumentLine->id_entity)->first();
+                    dd($oConceptXstudent);
                     $oConceptXstudent->total_paid -= $oDocumentLine->amount;
                     $oConceptXstudent->already_paid = 0;
                     $oConceptXstudent->save();
