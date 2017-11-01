@@ -508,7 +508,7 @@ public function saveDocumentPayment(Request $request)
                     //GET DEBT OF STUDENT
                     $ilastIdConcept = $oDocumentLine->id_entity;
                     $oConceptXstudent = conceptxstudent::where("id_student",$document_number->id_student)->where("id_concept",$oDocumentLine->id_entity)->first();
-                    dd($oConceptXstudent);
+                    //dd($oConceptXstudent);
                     $oConceptXstudent->total_paid -= $oDocumentLine->amount;
                     $oConceptXstudent->already_paid = 0;
                     $oConceptXstudent->save();
