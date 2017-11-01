@@ -493,6 +493,8 @@ public function saveDocumentPayment(Request $request)
     {
         $document_number = payment_document::where("correlative_number",$request->document_number)->first();
 
+        dd($document_number);
+
         $sConfirmationMsg = "Documento de pago no encontrado";
 
         if(count($document_number)>0){
