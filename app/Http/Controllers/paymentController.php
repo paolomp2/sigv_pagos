@@ -58,7 +58,7 @@ class paymentController extends Controller
         $gc->entity_to_edit = Student::find($iId_student);
 
         $gc->concepts = $this->getConceptsbyStudentID($iId_student);
-        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student,true);
+        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student,true, true);
         $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student,true);
         //dd($cInterestxStudents);
         return view('cms.payment.selectConceptsToPay', compact('gc','cDiscountxStudents','cInterestxStudents'));
@@ -72,7 +72,7 @@ class paymentController extends Controller
 
         $gc->entity_to_edit = Student::find($iId_student);
         $gc->concepts = $this->getConceptsbyStudentID($iId_student);
-        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student,true);
+        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student,true,true);
         $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student,true);
 
         return view('cms.payment.receiptConsole', compact('gc','cDiscountxStudents', 'cInterestxStudents','iAmountToPay'));        
@@ -87,7 +87,7 @@ class paymentController extends Controller
         $iFlagAlreadyPaid = 0;
         $iPayment_document_total_to_pay = 0;
         $cConcepts = $this->getConceptsbyStudentID($iId_student);
-        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student,true);
+        $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($iId_student,true,true);
         $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($iId_student,true);
         
         
@@ -235,7 +235,7 @@ public function getConceptsByStudentID($iId_student)
     return DB::select(DB::raw($sQuery));
 }
 
-public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate)
+public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpirationDate, $OnlyHigherDiscount)
 {
 
     $sConditionExpirationDateConcept = "";
@@ -284,15 +284,17 @@ public function getDiscountsByStudentOrderByConcept($iId_student, $bConsiderExpi
 
     $cDicounts = DB::select(DB::raw($sQuery));
     
-    $iLastConceptKey = -1;
-    foreach ($cDicounts as $key => $oDicounts) {
-        
-        $iConceptKey = $oDicounts->id_concept;
-        if ($iLastConceptKey == $iConceptKey) {
-            unset($cDicounts[$key]);
-        }
-        $iLastConceptKey = $iConceptKey;
-    }
+    if($OnlyHigherDiscount){
+        $iLastConceptKey = -1;
+        foreach ($cDicounts as $key => $oDicounts) {
+            
+            $iConceptKey = $oDicounts->id_concept;
+            if ($iLastConceptKey == $iConceptKey) {
+                unset($cDicounts[$key]);
+            }
+            $iLastConceptKey = $iConceptKey;
+        }    
+    }    
 
     return $cDicounts;
 }
@@ -386,7 +388,7 @@ public function getDebsListWithOutDateLimit(Request $request)
     $id_student = Hashids::decode($id_md5)[0]-1000;
     $oStudent = Student::find($id_student);
     $cConcepts = $this->getConceptsbyStudentID($id_student);
-    $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($id_student, false);
+    $cDiscountxStudents = $this->getDiscountsByStudentOrderByConcept($id_student, false, false);
     $cInterestxStudents = $this->getInterestsByStudentOrderByConcept($id_student, false);
     
     return view('cms.payment.createPaymentDocument.selectConceptsToPay', compact('cConcepts','cDiscountxStudents','cInterestxStudents','oStudent','payment_document_number','creation_date'));  
