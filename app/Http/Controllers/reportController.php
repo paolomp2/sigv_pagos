@@ -114,8 +114,7 @@ class reportController extends Controller
     }
 
     public function paymentsByDatesReport(Request $request)
-    {   
-        
+    {        
         $iId_student=$request->student;
     	$gc = new generalContainer;
     	$gc->dateFrom = $request->dateFrom;

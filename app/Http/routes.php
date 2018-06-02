@@ -72,6 +72,7 @@ Route::group(['middleware' => 'auth'], function (){
 	Route::post('/saveDocumentPayment', ['as'=>'payments.saveDocumentPayment', 'uses' =>'paymentController@saveDocumentPayment']);
 		//update Payments
 	Route::get('/Payments/void/selectDocument', ['uses' =>'paymentController@Payments_void_selectDocument']);
+	Route::get('/Payments/void/{id_ini}/{id_end} ', ['uses' =>'paymentController@Payments_void_delete_masive_Document']);
 	Route::post('/Payments/void/selectDocument', ['as'=>'payments.void.deleteDocument','uses' =>'paymentController@Payments_void_deleteDocument']);
 		//showDocument
 	Route::get('/Payment/show_document/{id}', ['uses' =>'paymentController@Payments_show_document']);
@@ -150,7 +151,7 @@ Route::group(['middleware' => 'auth'], function (){
 
 	//TESTS
 	Route::get('/Tests/CreatePaymentDocument/BasicDates_01', ['uses' =>'generatorController@BasicDates_01']);
-	Route::post('/Test/createPaymentDocument/GeneratePayments_02', ['as'=>'Test.createPaymentDocument.GeneratePayments_02', 'uses' => 'generatorController@CreateDocs_02']);	
+	Route::post('/Test/createPaymentDocument/GeneratePayments_02', ['as'=>'Test.createPaymentDocument.GeneratePayments_02', 'uses' => 'generatorController@create_docs']);	
 });
 
 /*Event::listen('illuminate.query',function($query){
@@ -162,6 +163,7 @@ Route::group(['middleware' => 'auth'], function (){
 
 Route::get('/createStudents/{num_students}', ['uses' =>'testsController@createStudents']);
 Route::get('/test_payment/{year}/{amount}/{date_ini}/{date_end}', ['uses' =>'generatorController@create_docs']);
+Route::get('/test_payment/printDocuments/{first_id_payment_doc}/{last_id_payment_doc}', ['uses' =>'generatorController@printDocuments']);
 
 Route::get('/apply_discount_to_group/{id_discount}/{id_group}/{flag}', ['uses' =>'scheduleController@apply_discount_to_group']);
 

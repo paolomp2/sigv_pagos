@@ -352,16 +352,13 @@ class studentController extends Controller
         $request->file('file_excel')->move(
             base_path() . '/public/', $file_Name
         );
-
         //echo dd($file_Name);
-
         //cargar todas las hojas
             //según el nombre de la hoja, cargar o crear aula
                 //Para cada fila
                     //cargar cada nombre de alumno
                     //hacer split al nombre
                     //las 2 primeras palabras será considerados apellidos
-
         //global  $b_c;
         $bulck = new Bulck;
         $bulck->type = 1; //Type 1 = Students
@@ -369,11 +366,12 @@ class studentController extends Controller
         $bulck->file_name = $request->file('file_excel')->getClientOriginalName();
         $bulck->year = $mClassroom->year;
         $bulck->save();
-
         $oBulckContainer = new bulckContainer;
         $oBulckContainer->id = $bulck->id;
         $oBulckContainer->file_name = $request->file('file_excel')->getClientOriginalName();
 
+        //dd($file_Name);
+        //dd($mClassroom);
         $excel=Excel::load($file_Name, function($reader) use($oBulckContainer, $request, $bulck,$mClassroom) {
 
             //creando array auxiliar

@@ -22,7 +22,7 @@
               if (is_null($oPayment_document->Student()->first_name)) {
                 $student_name = $oPayment_document->Student()->full_name;
               }else{
-                $student_name = $oPayment_document->Student()->first_name." ".$oPayment_document->Student()->last_name;
+                $student_name = $oPayment_document->Student()->full_name;
               }
             ?>
             {{ $student_name }}

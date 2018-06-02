@@ -45,8 +45,9 @@ class generatorController extends Controller
     * @param date $date_ini initial date of the period
     * @param date $date_fin final date of the period
     */
-    public function CreateDocs_02(Request $request)
+    public function create_docs(Request $request)
     {   
+
         $amount = $request->amount;
         $date_ini = $request->date_start;
         $date_end = $request->date_end;
@@ -75,14 +76,15 @@ class generatorController extends Controller
                         s.prob_first_place
                 from conceptxstudent cxe, concepts c, students s
                 where cxe.already_paid = 0
-                and cxe.id_concept = c.id
-                and cxe.id_student = s.id
-                and cxe.already_paid = 0
-                and c.year >= $year
-                and cxe.deleted_at is null
-                and c.deleted_at is null
+                    and cxe.id_concept = c.id
+                    and cxe.id_student = s.id
+                    and cxe.already_paid = 0
+                    and c.year >= 2016
+                    and cxe.deleted_at is null
+                    and c.deleted_at is null
                 order by c.fecha_vigencia asc, s.prob_procrastination asc;";
 
+        //dd($query);
         $table = DB::select(DB::raw($query));
         $remaining_amount = $amount;
         //dd(gettype($table[0]));
@@ -207,6 +209,21 @@ class generatorController extends Controller
 
     }
 
+    public function printDocuments($first_id_payment_doc, $last_id_payment_doc)
+    {
+        $cPayment_document= payment_document::Where('id','>=',$first_id_payment_doc)
+                                            ->where('id','<=',$last_id_payment_doc)
+                                            ->OrderBy('date_sell')
+                                            ->get();       
+
+        //return view('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document')); 
+        //Print PDF
+        $view =  \View::make('Test.PaymentDocuments.PaymentToPrint', compact('cPayment_document'))->render();
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($view);
+        return $pdf->download('201706.pdf');
+    }
+
     public function get_array_prob($date_beg,$date_end)
     {
         $days = array(
@@ -286,7 +303,29 @@ class generatorController extends Controller
                             40 => '2016-10-08',
                             41 => '2016-11-01',
                             42 => '2016-12-08',
-                            43 => '2016-12-25'
+                            43 => '2016-12-25',
+                            43 => '2016-12-25',
+                            44 => '2017-01-01',
+                            45 => '2017-01-02',
+                            46 => '2017-01-03',
+                            47 => '2017-01-04',
+                            48 => '2017-01-05',
+                            49 => '2017-01-06',
+                            50 => '2017-01-07',
+                            51 => '2017-04-13',
+                            52 => '2017-04-14',
+                            53 => '2017-04-16',
+                            54 => '2017-05-01',
+                            55 => '2017-06-29',
+                            56 => '2017-07-28',
+                            57 => '2017-07-29',
+                            58 => '2017-08-30',
+                            59 => '2017-10-08',
+                            60 => '2017-11-01',
+                            61 => '2017-12-23',
+                            61 => '2017-12-24',
+                            62 => '2017-12-25',
+                            63 => '2017-12-26'
                             );
 
         $arrayDatesStringFormat = array();

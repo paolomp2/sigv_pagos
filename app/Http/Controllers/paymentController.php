@@ -540,6 +540,54 @@ public function saveDocumentPayment(Request $request)
         }
     }
 
+    public function Payments_void_delete_masive_Document($id_ini, $id_end)
+    {
+        $cDocument_number = payment_document::where("id",">=",$id_ini)->where("id","<=",$id_end)->get();
+
+        foreach ($cDocument_number as $document_number) {
+            
+            $cDocumentLine = Payment_document_line::where("id_document_payment",$document_number->id)->orderBy("type_entity")->get();
+            
+            $ilastIdConcept = -1;
+            //dd($cDocumentLine);
+            foreach ($cDocumentLine as $oDocumentLine) {
+                if ($oDocumentLine->type_entity == "CONCEPT") {                    
+                    //GET DEBT OF STUDENT
+                    $ilastIdConcept = $oDocumentLine->id_entity;
+                    $oConceptXstudent = conceptxstudent::where("id_student",$document_number->id_student)->where("id_concept",$oDocumentLine->id_entity)->first();
+                    //dd($oConceptXstudent);
+                    $oConceptXstudent->total_paid -= $oDocumentLine->amount;
+                    $oConceptXstudent->already_paid = 0;
+                    $oConceptXstudent->save();
+                }
+
+                if ($oDocumentLine->type_entity == "INTEREST") {
+                    //GET DEBT OF STUDENT
+                    $oConceptXstudent = conceptxstudent::where("id_student",$document_number->id_student)->where("id_concept",$ilastIdConcept)->first();
+                    //dd($ilastIdConcept);
+                    $oConceptXstudent->total_interest -= $oDocumentLine->amount;
+                    $oConceptXstudent->already_paid = 0;
+                    $oConceptXstudent->save();
+                }
+
+                if ($oDocumentLine->type_entity == "DISCOUNT") {
+                    //GET DEBT OF STUDENT
+                    $oConceptXstudent = conceptxstudent::where("id_student",$document_number->id_student)->where("id_concept",$ilastIdConcept)->first();
+                    $oConceptXstudent->total_discount -= $oDocumentLine->amount;
+                    $oConceptXstudent->already_paid = 0;
+                    $oConceptXstudent->save();
+                }
+            }
+
+            $document_number->delete();
+            $sConfirmationMsg = "Documento Eliminado exitosamente";
+        }
+
+        $sConfirmationMsg = "Documento de pago no encontrado";
+
+        
+    }
+
 
     //END UPDATE PAYMENT
 
